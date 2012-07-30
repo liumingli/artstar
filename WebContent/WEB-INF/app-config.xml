@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-3.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+	<util:properties id="systemConfigurer" location="classpath:syscfg.properties" />
+
+	<!-- dataSource for MySQL -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/artplanet"/>
+		<property name="username" value="artplanet" />
+		<property name="password" value="20120723" />
+	</bean>
+
+	<!-- WebEntrance servlet调用，负责处理客户端请求参数并启动任务 -->
+
+	<bean id="appStarter" class="com.ybcx.art.facade.AppStarter">
+		<property name="apiAdaptor" ref="apiAdaptor" />
+		<property name="assistProcess" ref="assistProcess" />
+	</bean>
+	
+	<bean id="assistProcess" class="com.ybcx.art.facade.AssistProcess">
+		<property name="apiAdaptor" ref="apiAdaptor" />
+	</bean>
+	
+	<bean id="apiAdaptor" class="com.ybcx.art.facade.ApiAdaptor">
+		<property name="artService" ref="artService" />
+	</bean>
+	
+	<bean id="artService" class="com.ybcx.art.facade.ArtServiceImplement">
+		<property name="dbVisitor" ref="dbAcess" />
+		<property name="systemConfigurer" ref="systemConfigurer" />
+	</bean>
+
+	<!--将共享的DataSource实例注入到DAO中，JdbcTemplate实例在DataSource的setter方法中被创建 -->
+	<bean id="dbAcess" class="com.ybcx.art.dao.impl.DBAccessImplement">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+</beans>

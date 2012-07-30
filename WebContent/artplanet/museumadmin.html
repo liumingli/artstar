@@ -1,0 +1,488 @@
+<!DOCTYPE html >
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Art Planet Admin v1.0</title>
+<link rel="stylesheet" href="css/jquery.ui.all.css">
+<link rel="stylesheet" href="css/imageareaselect/imgareaselect-deprecated.css">
+<style>
+	body {
+		font-size: 62.5%; /*所有的字体都减小*/
+	}
+	h1 {
+		color:#5999DE;
+		text-align:center;
+		font-size: 2.4em;
+		margin: .6em 0;
+	}	
+	h2 {
+		color:#666666;
+		text-align:center;
+	}
+	form.outter {		
+		margin:auto;/*center the form*/
+		padding-top:5px;
+		min-width: 300px;
+		max-width: 500px;
+		width: 400px;
+		border:1px solid #ccc;
+		background-color:#d5e4f3;
+	}
+	form.opened{
+		width: 250px;
+		height: 150px;
+		padding: 0;
+	}
+	label {
+		color:#666666;
+		float: left;
+		width: 60px;/* 这个宽度很重要啊，否则对不齐了，包括弹出的窗口*/
+		padding: 0;
+		margin-top:4px;
+		text-align: right;
+	}
+	input {
+		padding: 1px; /* 越大高度越高*/
+		margin-top:0px;
+		margin-left:10px;/* a blank between label and input*/
+		width: 250px;
+	}
+	img#shotImg{
+		padding: 1px; /* 越大高度越高*/
+		margin-top:0px;
+		margin-left:10px;/* a blank between label and input*/
+	}
+	input:required {outline: 1px blue solid; color:red;}/* 为特定属性加样式 */
+	input.short { margin-bottom:4px; width:130px; padding: 2px; }
+	
+	select {
+		margin-left:10px;/* a blank between label and input*/
+		width: 100px;
+	}
+	textarea {
+		width: 250px;
+		height: 100px;
+		max-width: 300px;
+		max-height: 100px;
+		margin-left:10px;
+		padding: 2px; 
+		resize: none;
+	}	
+	
+
+	.validateTips { border: 1px solid transparent; padding: 0.3em; }	
+	
+	.entry {
+		margin-top:.5em;
+		margin-bottom:.5em;
+	}
+	.button {
+		float: right;
+		padding-right:50px;
+		padding-bottom:5px;
+		padding-top:5px;
+	}
+	.addcity {
+		padding-left:2px;			
+	}
+		
+</style>
+	<script src="jquery/jquery-1.7.2.min.js"></script>
+	<script src="jquery/ui/jquery.ui.core.js"></script>
+	<script src="jquery/ui/jquery.ui.widget.js"></script>
+	<script src="jquery/ui/jquery.ui.datepicker.js"></script>
+	<script src="jquery/ui/jquery.ui.mouse.js"></script>
+	<script src="jquery/ui/jquery.ui.button.js"></script>
+	<script src="jquery/ui/jquery.ui.draggable.js"></script>
+	<script src="jquery/ui/jquery.ui.position.js"></script>
+	<script src="jquery/ui/jquery.ui.resizable.js"></script>
+	<script src="jquery/ui/jquery.ui.dialog.js"></script>
+	<script src="jquery/ui/jquery.effects.core.js"></script>
+	
+	<script type="text/javascript" src="js/jquery.ui.widget.js"
+	    charset="utf-8"></script>
+	<script type="text/javascript" src="js/jquery.iframe-transport.js"
+		charset="utf-8"></script>
+	<script type="text/javascript" src="js/jquery.fileupload.js"
+		charset="utf-8"></script>
+		
+	<script src="js/imageareaselect/jquery.imgareaselect.js"></script>
+	<script src="js/imageareaselect/jquery.imgareaselect.pack.js"></script>	
+		
+	<script>
+
+	//main function...
+	$(function() {
+		
+		//fill country/city select options...
+		var americaCN = "美国", americaEN = "america";
+		var germanCN = "德国", germanEN = "german";
+		$("#country").append("<option value="+americaEN+">"+americaCN+"</option>");
+		$("#country").append("<option value='german'>德国</option>");
+		
+		
+		//create datepicker components...
+		$( "#datepicker_start" ).datepicker();
+		$( "#datepicker_start" ).datepicker("option", "dateFormat","yy-mm-dd");
+		$( "#datepicker_end" ).datepicker();
+		$( "#datepicker_end" ).datepicker("option", "dateFormat","yy-mm-dd");
+		
+		//art event form elements...
+		var museumName = $("#museumName"), country = $("#country"), city = $("#city"), shotPath = $("#shotPath"), url = $("#url"), description = $("#description"); 
+				
+		//sending art event to backend...
+		$("#submit").click(function(){
+			var flag = checkNull(museumName,country,city,shotPath,url,description);
+			//检验空
+			if(flag){
+				//提交
+				createMuseum(museumName.val(),country.val(),city.val(),shotPath.val(),url.val(),description.val());
+				//清空表单
+				clearFormInputs(museumName,country,city,shotPath,url,description);
+				//show the loading image...
+				$('#subm').attr("style","visibility:visible");
+			}else{
+				$('#subm').attr("style","visibility:visible");
+				$('#subm').children().remove();
+				$('#subm').append('<font color="red">所有字段不能为空</font>');
+			}
+		});
+		
+		
+		//dialog used form elements...
+		var countryCN = $( "#countryCN" ), countryEN = $( "#countryEN" ),
+		cityCN = $( "#cityCN" ), cityEN = $( "#cityEN" ), longitude = $( "#longitude" ), latitude = $( "#latitude" );
+		
+		//initialize dialog interaction...
+		$( "#dialog-form" ).dialog({
+			autoOpen: false,
+			height: 310,
+			width: 280,
+			modal: true,
+			resizable: false,
+			buttons: {
+				"添加": function() {
+					var flag = checkNull(countryCN,countryEN,cityCN,cityEN,longitude,latitude);
+					//检验空
+					if(flag){
+						//获取表单输入字符串					
+						//FIXME, submit immediately right now...
+						createCityofCountry(countryCN.val(),countryEN.val(),cityCN.val(),cityEN.val(),longitude.val(),latitude.val());					
+						//清空输入内容					
+						clearFormInputs(countryCN,countryEN,cityCN,cityEN,longitude,latitude);					
+						//show progress bar...
+						$("#loadingtxt").remove();
+						$(".ui-dialog-buttonpane").append('<p id="loadingtxt" style="text-align:center;">loading...</p>');					
+					}else{
+						$("#loadingtxt").remove();
+						$(".ui-dialog-buttonpane").append('<p id="loadingtxt" style="text-align:center;"><font color="red">所有字段不能为空</font></p>');					
+					}
+				},
+				"关闭": function() {
+					$( this ).dialog( "close" );
+					$("#loadingtxt").remove();
+				}
+			},//end of buttons
+			close: function() {
+				$("#loadingtxt").remove();
+			}
+		});//end of dialog controling...
+
+		//create button skin and event...
+		$( "#create-city" )
+			.button()
+			.click(function() {
+				$( "#dialog-form" ).dialog( "open" );				
+			});//open dialog...				
+		
+	});//end of js main function...
+	
+	//TODO, submit to backend...
+	function createCityofCountry(cntrCN, cntrEN, cityCN, cityEN, lon, lat){
+		console.log("saving city to backend...");
+		$.post('/artstar/artapi', {
+			'method' : 'addCountryCity',
+			'country' : cntrEN,
+			'countryCN' : cntrCN,
+			'city' : cityEN,
+			'cityCN' : cityCN,
+			'longitude' : lon,
+			'latitude' : lat
+		}, 
+		//回调函数
+		function (result) {
+			$("#loadingtxt").remove();
+			if(result == "false"){
+				$(".ui-dialog-buttonpane").append('<p id="loadingtxt" style="text-align:center;"><img src="icons/no.png"></p>');					
+			}else{
+				$(".ui-dialog-buttonpane").append('<p id="loadingtxt" style="text-align:center;"><img src="icons/ok.png"></p>');					
+			}
+		});
+	}
+	
+	//TODO, submit the art event...
+	function createMuseum(museumName,country,city,shotPath,url,description){
+		console.log("send art event details...");	
+		$.post('/artstar/artapi', {
+			'method' : 'addArtMuseum',
+			'name' : museumName,
+			'country' : country,
+			'city' : city,
+			'shotPath' : shotPath,
+			'url' : url,
+			'description' : description
+		}, 
+		//回调函数
+		function (result) {
+			$('#subm').children().remove();
+			$('#shot').children().remove();
+			var html = '<input type="file" id="fileUpload" data-url="/artstar/fileupload" accept="image/jpeg,image/png,image/gif">';
+			$('#shot').append(html);
+			if(result == "false"){
+				$('#subm').append('<img src="icons/no.png">');
+			}else{
+				$('#subm').append('<img src="icons/ok.png">');
+			}
+		});
+		
+	}
+	
+	//清除方法中所有输入元素的内容，在提交之后
+	function clearFormInputs(){
+		var params = arguments;		
+		for(var i=0; i<params.length; i++){
+			//clear input value...
+			params[i].attr("value", "");
+		}
+	}
+	
+	//检查字段空值
+	function checkNull(){
+		var flag = true;
+		var params = arguments;		
+		for(var i=0; i<params.length; i++){
+			//clear input value...
+			var val = params[i].attr("value");
+			console.log(val)
+			if(val == null || val == ""){
+				flag = false;
+			}
+		}
+		return flag;
+	}
+	
+</script>
+
+</head>
+<body>
+
+<h1>艺术星球后台管理 v1.0</h1>
+<!-- start of form, prevent the form auto submit -->
+<form class="outter" onsubmit="return false;">
+<fieldset>
+<legend>新增艺术馆</legend>
+    <!-- entry end -->
+    <div class="entry">
+        <label for="museumName">艺术馆名称 </label>
+        <!-- 这里定义HTML5新属性：autofocus required，其样式见上 -->
+        <input id="museumName"  name= "museumName" type="text" autofocus required>
+    </div>
+    <!-- entry end -->
+    <div class="entry" >
+        <label for="country">地点</label>
+        <select id="country">
+			<option value="china">中国</option>			
+		</select>		
+        <select id="city">
+			<option value="beijing">北京</option>
+			<option value="saab">Saab</option>
+			<option value="fiat">Fiat</option>
+			<option value="audi">Audi</option>
+		</select>
+		<img id="create-city" alt="opencity window" src="icons/add.png" class="addcity"></img>
+    </div>
+    <!-- entry end -->
+    <div class="entry">
+        <label for="shot">外景截图</label>
+        <span  id ="shot">
+        	<input type="file" id="fileUpload" data-url="/artstar/fileupload" accept="image/jpeg,image/png,image/gif">
+        </span>	
+        <span  style="display: none;" id="fileInfo"></span>
+        <input type="hidden" id="shotPath">
+    </div>
+    <!-- entry end -->
+    <div class="entry">
+        <label for="url">官方地址</label>
+        <input id="url"  name="url" type="text">
+    </div>     
+    
+    <!-- entry end -->
+    <div class="entry">
+    	<label for="description">摘要介绍</label>
+    	<textarea id="description" name="description" ></textarea>
+    </div>
+    <!-- entry end -->
+    <div class="button">
+    	<!-- 先隐藏进度条，提交时显示 -->
+    	<span id="subm" style="visibility:hidden">
+			<img src="icons/loading.gif" >
+		</span>
+        <button id="submit">提交</button>
+    </div>
+    
+    </fieldset>
+</form>
+<!-- end of form -->
+<!-- start of popup -->
+<div id="dialog-form" title="Create new City">	
+	<form class="opened">
+	<fieldset>
+		<div class="entry">
+			<label for="countryCN" >国家</label>
+			<input class="short" type="text" name="countryCN" id="countryCN"/>			
+		</div>
+		<div class="entry">			
+			<label for="countryEN" >Country</label>
+			<input class="short" type="text" name="countryEN" id="countryEN"/>
+		</div>
+		<div class="entry">	
+			<label for="cityCN" >城市</label>
+			<input class="short" type="text" name="cityCN" id="cityCN" />
+		</div>
+		<div class="entry">	
+			<label for="cityEN" >City</label>
+			<input class="short" type="text" name="cityEN" id="cityEN" />
+		</div>
+		<div class="entry">	
+			<label for="longitude" >经度</label>
+			<input class="short" type="text" name="longitude" id="longitude" />
+		</div>
+		<div class="entry">	
+			<label for="latitude" >纬度</label>
+			<input class="short" type="text" name="latitude" id="latitude" />
+		</div>
+	</fieldset>
+	</form>
+</div>
+<!-- end of popup -->
+
+<script>
+	
+	$('#fileUpload').fileupload({
+		add : function(e, data) {
+			var fileName = data.files[0].name;
+			var regexp = /\.(png)|(jpg)|(gif)$/i;
+		    if (!regexp.test(fileName)) {
+		    	  $('#fileInfo').show().html('<img src="icons/no.png">');
+		    }else{
+				var jqXHR = data.submit().success(
+						function(result, textStatus, jqXHR) {
+							if(result == "reject"){
+							    $('#fileInfo').show().html('<img src="icons/no.png">');
+							}else{
+								$('#shotPath').val(result);
+								$('#fileInfo').show().html('<img src="icons/ok.png">');
+								
+								//禁用文件上传
+								//$('#fileUpload').attr("style","visibility:hidden");
+								$('#fileUpload').attr('disabled','disabled');
+								
+								//可以框选图片的操作
+								var html = '<img id="shotImg" src="/artstar/artapi?method=getMuseumShot&relativePath='+result+'">';
+								html += '<div align="center" id="opt"><button onclick="saveSelectedImg()">继续</button>';
+								html += '<button onclick="reelect()">重选</button></div>';
+								$('#shot').append(html);
+								
+								//注册可以框选裁剪图片的js
+								initSelectImage();
+								
+							}
+						}).error(
+						function(jqXHR, textStatus, errorThrown) {
+							console.log("error");
+							$('#fileInfo').show().html('<img src="imgs/no.png">');
+						}).complete(
+						function(result, textStatus, jqXHR) {
+							console.log(result);
+						});
+		    }
+		}
+	});
+	
+	
+	var ias = null;
+	var selectionImg = null;
+	
+	function initSelectImage(){
+		$(document).ready(function () {
+		        ias = $('#shotImg').imgAreaSelect({
+		    	maxWidth: 200,
+		    	maxHeight: 150,
+		        handles: true,
+		        instance: true,
+		        x1: 0,
+		        y1: 0,
+		        x2: 200,
+		        y2: 150,
+		        onInit: function (img, selection) {
+		        	selectionImg = selection;
+		        	console.log('width: ' + selectionImg.width + ',height: ' + selectionImg.height + ',x1: ' + selection.x1 + ',y1: ' + selection.x2);
+		        },
+		        onSelectEnd: function (img, selection) {
+		        	selectionImg = selection;
+		        	console.log('width: ' + selectionImg.width + ',height: ' + selectionImg.height + ',x1: ' + selection.x1 + ',y1: ' + selection.x2);
+		        }
+		    });
+		});
+	}
+	
+	
+	//上传框选后的图片到后台
+	function saveSelectedImg(){
+		console.log("saveSelectedImg");
+		if(selectionImg == null){
+			return;
+		}
+	 	$.post('/artstar/artapi', {
+			'method' : 'uploadShot',
+			'srcPath' : $('#shotPath').val(),
+			'width' : selectionImg.width,
+			'height' : selectionImg.height,
+			'xPosition' : selectionImg.x1,
+			'yPosition' : selectionImg.y1
+		}, 
+		//回调函数
+		function (result) {
+			console.log("cancelSelection");
+			if(ias != null){
+				ias.cancelSelection();
+			}
+			
+			if(result == "false"){
+				 reelect();
+			}else{
+				//显示截后的图片
+				$('#shot').children().remove();
+				var html = '<img id="shotImg" src="/artstar/artapi?method=getMuseumShot&relativePath='+result+'">';
+				$('#shot').append(html);
+				$('#shotPath').val(result);
+			}
+		});
+	}
+	
+	function reelect(){
+		//删除选择框
+		if(ias != null){
+			ias.cancelSelection();
+		}
+		$('#shotImg').remove();
+		$('#opt').remove();
+		//	$('#fileUpload').attr("style","visibility:visible");
+		$('#fileUpload').removeAttr('disabled');
+		$('#shotPath').attr("value","");
+	}
+	
+</script>
+
+</body>
+</html>

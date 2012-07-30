@@ -1,0 +1,104 @@
+<!DOCTYPE html >
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Welcome to Art Planet</title>
+	
+	<link rel="stylesheet" href="css/app.css">
+	
+	<script src="jquery/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="js/Three.js"></script>
+	<script type="text/javascript" src="js/OrbitControls.js"></script>
+	<script type="text/javascript" src="js/Detector.js"></script>
+	<script type="text/javascript" src="js/Earth.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	<script type="text/javascript">
+	
+		var container, planet;
+		
+		function createCubes(){
+			
+		}	
+		
+		window.onload = function() {
+			if ( !Detector.webgl ) {
+				Detector.addGetWebGLMessage();
+				return;
+			}
+			
+			//add interactive events for link...
+			createLeftMenus();						
+			createEventsToday();				
+
+			
+			container = document.getElementById("container");	
+			
+			//TODO, Planet init...
+			planet = new RBT.Earth(container);
+			planet.run();//start 3d engine...
+			planet.onMeshClick = function(id,name){
+			//	console.log("the mesh is: "+id+"/"+name);
+			}
+			
+			var color = new THREE.Color( 0xFF0000);
+			//----------- beijing -----------------to add more... 
+			planet.createCube(116.4, 39.9, 0.05, color, "123", "beijing");
+			//----------- london ---------------
+			planet.createCube(0.1, 51.3, 0.05, color, "234", "london");	
+			//----------- wengehua -----------
+			planet.createCube(-123.1, 49.2, 0.05, color, "345", "wengehua");
+			//----------- xini ------------------
+			planet.createCube(151.1, -33.5, 0.05, color, "456", "xini");
+			
+			
+			//旋转到目标点 longitude, latitude
+			
+			//-------- 北京 -----------------			
+			planet.flyTo(116, 40);
+			//-------- 伦敦 -----------------
+//			planet.flyTo(0.1, 51.3);
+			//-------- 温哥华 -----------------
+//			planet.flyTo(-123.1, 49.2);
+			//-------- 悉尼 -----------------
+//			planet.flyTo(151.1, -33.5);
+			
+			//-------- 初始位置 -----------------
+//			planet.flyTo(-90, 0);
+									
+			
+		} //end of app initialize...
+		
+		
+	</script>
+</head>
+<body>
+	<!-- WebGL容器放在底部 -->
+	<div id="container"></div>
+	<!-- 标题 -->
+	 <div id="maintitle">
+	    艺术星球 v1.0
+	 </div>
+	 <div id="subtitle">
+	   汇集全球艺术事件，尽在艺术星球！
+	 </div>
+	 <!-- 左侧列表菜单 -->
+	 <div id="menulinks">
+	 	<a href="javascript:;" id="todayevents" >今日事件</a><br/><br/>
+	 	<a href="javascript:;" id="thisweekevents" >本周事件</a><br/><br/>
+	 	<a href="javascript:;" id="nextweekevents" >下周事件</a><br/><br/>
+	 	<a href="javascript:;" id="thismonthevents" >本月事件</a><br/><br/>
+	 	<a href="javascript:;" id="nextmonthevents" >下月事件</a><br/><br/>
+	 </div>
+	 <!-- 右上角搜索输入框 -->
+	 <div id="searchdiv">
+		 <form onsubmit="return false;">  
+	  		<input type="text" name="searchinput" id="searchinput" class="short" 
+	  			placeholder="输入艺术事件关键字" />
+	  		<input type="button" value="查 询" class="button"/>
+		 </form>
+	 </div>
+	 <!-- 右侧事件信息大列表 -->
+	 <div id="eventlist">	
+	 </div>
+</body>
+</html>

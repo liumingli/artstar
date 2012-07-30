@@ -1,0 +1,86 @@
+	 html {
+	     height: 100%;
+	 }
+	    
+     body {
+        margin: 0;
+        padding: 0;
+        background: #000000 ;
+        color: #ffffff;		/* 文字默认颜色 */
+        font-family: sans-serif;
+        font-size: 13px;
+        line-height: 20px;
+        height: 100%;
+      }
+       
+      #maintitle {
+        position: absolute;
+        top: 20px;
+        left: 20px;        
+        width: 270px;
+        padding: 10px;
+        font-size: 26px;
+      }
+      #subtitle {
+        position: absolute;
+        top: 50px;
+        left: 70px;        
+        width: 300px;
+        padding: 10px;
+        font-size: 14px;
+      }
+      #menulinks {
+        position: absolute;
+        top: 180px;
+        left: 20px;        
+        width: 100px;
+        padding: 10px;
+        font-size: 16px;
+      }
+      #searchdiv {
+      	 position: absolute;
+         top: 10px;
+         right: 20px;        
+         width: 250px;
+         padding: 10px;
+         font-size: 12px;
+      }
+      #eventlist {
+      	 position: absolute;
+         top: 60px;
+         right: 10px;        
+         width: 270px;         
+         padding: 0px;
+         font-size: 12px;
+         /* border: 1px solid #FF0000; */          
+      }
+      
+      input.short { color: #CCCCCC}
+      
+      /* 普通链接去掉下划线  */
+      a:link {text-decoration:none; }    /* unvisited link */
+      /* 移上去出现下划线 */
+      a:hover {text-decoration:none;}   /* mouse over link */      
+      a:active {color: #FFFFFF} /* mouse down */
+      /* 实时修改链接样式，实现选中逻辑 */
+      .linkselected { color:#FFFFFF; }   
+      
+      .button {		  
+		 color: #ffffff;
+		 font-size: 12px;
+		 padding: 4px;
+		 text-decoration: none;
+		 -webkit-border-radius: 10px;
+		 -moz-border-radius: 10px;
+		 -webkit-box-shadow: 0px 1px 1px #666666;
+		 -moz-box-shadow: 0px 1px 1px #666666;
+		 text-shadow: 1px 1px 1px #666666;
+		 border: solid #4a5175 0px;
+  		 background: -webkit-gradient(linear, 0 0, 0 100%, from(#999999), to(#000000));
+  	  	 background: -moz-linear-gradient(top, #999999, #000000);
+	}
+	.button:hover {	 
+  	    background: -webkit-gradient(linear, 0 0, 0 100%, from(#9f3ffa), to(#5b05fa));
+ 	    background: -moz-linear-gradient(top, #9f3ffa, #5b05fa);
+	}
+     
