@@ -6,6 +6,6 @@
 <title>Home Page</title>
 </head>
 <body>
-	Hello everyone!
+	<% response.sendRedirect("artplanet/index.html"); %>
 </body>
 </html>
