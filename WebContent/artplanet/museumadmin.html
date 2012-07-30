@@ -86,6 +86,10 @@
 		padding-left:2px;			
 	}
 		
+	#create-city{
+			vertical-align:text-bottom;
+	}
+		
 </style>
 	<script src="jquery/jquery-1.7.2.min.js"></script>
 	<script src="jquery/ui/jquery.ui.core.js"></script>
@@ -115,11 +119,8 @@
 	$(function() {
 		
 		//fill country/city select options...
-		var americaCN = "美国", americaEN = "america";
-		var germanCN = "德国", germanEN = "german";
-		$("#country").append("<option value="+americaEN+">"+americaCN+"</option>");
-		$("#country").append("<option value='german'>德国</option>");
-		
+		//初始化下拉选框
+		initSelectOptions();
 		
 		//create datepicker components...
 		$( "#datepicker_start" ).datepicker();
@@ -196,6 +197,28 @@
 			});//open dialog...				
 		
 	});//end of js main function...
+	
+	function initSelectOptions(){
+		console.log("init country and city options...");
+		//country,city
+		$.post('/artstar/artapi',{
+			'method' : 'getAllCountryCity'
+		},
+		function(result){
+			if(result.length > 0){
+				for(key in result){
+					var countryCN = result[key].countryCN, countryEN =  result[key].country;
+					$("#country").append("<option value="+countryEN+">"+countryCN+"</option>");
+					var cityCN = result[key].cityCN, cityEN =  result[key].city;
+					$("#city").append("<option value="+cityEN+">"+cityCN+"</option>");
+				}
+			}else{
+				console.log("init countrycity error");
+				$("#country").append("<option value='china'>中国</option>");
+				$("#city").append("<option value='beijing'>北京</option>");
+			}
+		},"json");
+	}
 	
 	//TODO, submit to backend...
 	function createCityofCountry(cntrCN, cntrEN, cityCN, cityEN, lon, lat){
@@ -291,13 +314,8 @@
     <div class="entry" >
         <label for="country">地点</label>
         <select id="country">
-			<option value="china">中国</option>			
 		</select>		
         <select id="city">
-			<option value="beijing">北京</option>
-			<option value="saab">Saab</option>
-			<option value="fiat">Fiat</option>
-			<option value="audi">Audi</option>
 		</select>
 		<img id="create-city" alt="opencity window" src="icons/add.png" class="addcity"></img>
     </div>

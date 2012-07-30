@@ -129,5 +129,51 @@ public class DBAccessImplement  implements DBAccessInterface {
 		return res;
 	}
 
+	@Override
+	public List<Location> getAllCountryCity() {
+		List<Location> resList = new ArrayList<Location>();
+		String sql = "select * from citylocation order by cl_city";
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+		if (rows != null && rows.size() > 0) {
+			for (int i = 0; i < rows.size(); i++) {
+				Map<String, Object> map = (Map<String, Object>) rows.get(i);
+				Location loc = new Location();
+				loc.setId(map.get("cl_id").toString());
+				loc.setCity(map.get("cl_city").toString());
+				loc.setCountry(map.get("cl_country").toString());
+				loc.setCityCN(map.get("cl_cityCN").toString());
+				loc.setCountryCN(map.get("cl_countryCN").toString());
+				loc.setLatitude(map.get("cl_latitude").toString());
+				loc.setLongitude(map.get("cl_longitude").toString());
+				resList.add(loc);
+			}
+		}
+		return resList;
+	}
+
+	@Override
+	public List<Location> getTopTenCity() {
+		List<Location> resList = new ArrayList<Location>();
+		String sql = "select c.cl_id,c.cl_city,c.cl_cityCN,c.cl_country,c.cl_countryCN,c.cl_longitude,c.cl_latitude,count(m.am_id) as cl_count" +
+				" from citylocation c,apmuseum m where c.cl_city = m.am_city group by m.am_city order by c.cl_city";
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+		if (rows != null && rows.size() > 0) {
+			for (int i = 0; i < rows.size(); i++) {
+				Map<String, Object> map = (Map<String, Object>) rows.get(i);
+				Location loc = new Location();
+				loc.setId(map.get("cl_id").toString());
+				loc.setCity(map.get("cl_city").toString());
+				loc.setCountry(map.get("cl_country").toString());
+				loc.setCityCN(map.get("cl_cityCN").toString());
+				loc.setCountryCN(map.get("cl_countryCN").toString());
+				loc.setLatitude(map.get("cl_latitude").toString());
+				loc.setLongitude(map.get("cl_longitude").toString());
+				loc.setCount(Integer.parseInt(map.get("cl_count").toString()));
+				resList.add(loc);
+			}
+		}
+		return resList;
+	}
+
 
 }

@@ -271,4 +271,16 @@ public class ArtServiceImplement implements ArtServiceInterface {
 		return result;
 	}
 
+	@Override
+	public List<Location> getAllCountryCity() {
+		List<Location> list = dbVisitor.getAllCountryCity();
+		return list;
+	}
+
+	@Override
+	public List<Location> getTopTenCity() {
+		List<Location> list = dbVisitor.getTopTenCity();
+		return list;
+	}
+
 }

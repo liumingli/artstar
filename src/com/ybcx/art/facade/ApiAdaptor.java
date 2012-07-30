@@ -11,6 +11,7 @@ import net.sf.json.JSONArray;
 
 import org.apache.commons.fileupload.FileItem;
 
+import com.ybcx.art.beans.Location;
 import com.ybcx.art.beans.Museum;
 
 
@@ -105,6 +106,16 @@ public class ApiAdaptor {
 			String x, String y) {
 		String res = artService.uploadShot(srcPath,width,height,x,y);
 		return res;
+	}
+	
+	public String getAllCountryCity() {
+		List<Location> list = artService.getAllCountryCity();
+		return JSONArray.fromCollection(list).toString();
+	}
+	
+	public String getTopTenCity() {
+		List<Location> list = artService.getTopTenCity();
+		return  JSONArray.fromCollection(list).toString();
 	}
 
 

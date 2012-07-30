@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 
+import com.ybcx.art.beans.Location;
 import com.ybcx.art.beans.Museum;
 
 
@@ -30,5 +31,9 @@ public interface ArtServiceInterface {
 
 	public String uploadShot(String srcPath, String width, String height,
 			String x, String y);
+
+	public List<Location> getAllCountryCity();
+
+	public List<Location> getTopTenCity();
 
 }

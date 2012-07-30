@@ -10,6 +10,15 @@ public class Location {
 	private String latitude;
 	private String longitude;
 	
+	//用来存储某个城市下的艺术馆数
+	private int count;
+	
+	public int getCount() {
+		return count;
+	}
+	public void setCount(int count) {
+		this.count = count;
+	}
 	public String getId() {
 		return id;
 	}

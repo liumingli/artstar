@@ -27,4 +27,10 @@ public interface ExtVisitorInterface {
 	
 	//上传裁剪后的截图
 	public static final String UPLOADSHOT = "uploadShot";
+	
+	//获取所有的国家和城市
+	public static final String GETALLCOUNTRYCITY = "getAllCountryCity";
+	
+	//获取排名前十的国家
+	public static final String TOPTENCITY = "topTenCity";
 }

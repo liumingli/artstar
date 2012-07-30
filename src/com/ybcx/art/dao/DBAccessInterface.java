@@ -16,5 +16,10 @@ public interface DBAccessInterface {
 
 	public int addCountryCity(Location location);
 
+	public List<Location> getAllCountryCity();
+	
+	public List<Location> getTopTenCity();
+
+
 
 }
