@@ -241,10 +241,10 @@ public class ArtServiceImplement implements ArtServiceInterface {
 	}
 
 	@Override
-	public List<Museum> getMuseumBy(String page, String country) {
+	public List<Museum> getMuseumBy(String page, String location) {
 		int pageNum = Integer.parseInt(page);
 		int pageSize = Integer.parseInt(systemConfigurer.getProperty("pageSize"));
-		List<Museum> list = dbVisitor.getMuseumBy(pageNum,pageSize,country);
+		List<Museum> list = dbVisitor.getMuseumBy(pageNum,pageSize,location);
 		return list;
 	}
 
@@ -281,6 +281,20 @@ public class ArtServiceImplement implements ArtServiceInterface {
 	public List<Location> getTopTenCity() {
 		List<Location> list = dbVisitor.getTopTenCity();
 		return list;
+	}
+
+	@Override
+	public String deleteImage(String relativePath) {
+		boolean flag = false;
+		String filePath = imagePath +File.separator +relativePath;
+		File file = new File(filePath);
+		if(file.exists()){
+			boolean del = file.delete();
+			if(del){
+				flag = true;
+			}
+		}
+		return String.valueOf(flag);
 	}
 
 }

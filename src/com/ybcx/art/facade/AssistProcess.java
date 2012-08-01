@@ -76,8 +76,8 @@ public class AssistProcess {
 			res.setContentType("text/plain;charset=UTF-8");
 			PrintWriter pw = res.getWriter();
 			String page = req.getParameter("page");
-			String country = req.getParameter("country");
-			String result= apiAdaptor.getMuseumBy(page,country);
+			String location = req.getParameter("location");
+			String result= apiAdaptor.getMuseumBy(page,location);
 			log.debug(result);
 			pw.print(result);
 			pw.close();
@@ -99,6 +99,15 @@ public class AssistProcess {
 			res.setContentType("text/plain;charset=UTF-8");
 			PrintWriter pw = res.getWriter();
 			String result= apiAdaptor.getAllCountryCity();
+			log.debug(result);
+			pw.print(result);
+			pw.close();
+			
+		}else if (action.equals(AppStarter.DELETEIMAGE)) {
+			res.setContentType("text/plain;charset=UTF-8");
+			PrintWriter pw = res.getWriter();
+			String relativePath = req.getParameter("relativePath");
+			String result= apiAdaptor.deleteImage(relativePath);
 			log.debug(result);
 			pw.print(result);
 			pw.close();

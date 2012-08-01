@@ -325,7 +325,7 @@
         <span  id ="shot">
         	<input type="file" id="fileUpload" data-url="/artstar/fileupload" accept="image/jpeg,image/png,image/gif">
         </span>	
-        <span  style="display: none;" id="fileInfo"></span>
+<!--         <span  style="display: none;" id="fileInfo"></span> -->
         <input type="hidden" id="shotPath">
     </div>
     <!-- entry end -->
@@ -497,6 +497,21 @@
 		$('#opt').remove();
 		//	$('#fileUpload').attr("style","visibility:visible");
 		$('#fileUpload').removeAttr('disabled');
+		
+		//删除刚才已上传的图片，避免垃圾
+		deleteImage();
+	}
+	
+	function deleteImage(){
+		$.post('/artstar/artapi', {
+			'method' : 'deleteImage',
+			'relativePath' : $('#shotPath').val()
+		}, 
+		function(result){
+			if(result == "true"){
+				console.log("delete unuseful image success");
+			}
+		});
 		$('#shotPath').attr("value","");
 	}
 	

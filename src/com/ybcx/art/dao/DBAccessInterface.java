@@ -10,7 +10,7 @@ public interface DBAccessInterface {
 
 	public List<Museum> searchMuseumBy(String key);
 
-	public List<Museum> getMuseumBy(int pageNum, int pageSize, String country);
+	public List<Museum> getMuseumBy(int pageNum, int pageSize, String location);
 	
 	public int addArtMuseum(Museum museum);
 

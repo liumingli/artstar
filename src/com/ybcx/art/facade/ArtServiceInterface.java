@@ -27,7 +27,7 @@ public interface ArtServiceInterface {
 	public String addCountryCity(String country, String countryCN, String city,
 			String cityCN, String longitude, String latitude);
 
-	public List<Museum> getMuseumBy(String page, String country);
+	public List<Museum> getMuseumBy(String page, String location);
 
 	public String uploadShot(String srcPath, String width, String height,
 			String x, String y);
@@ -35,5 +35,7 @@ public interface ArtServiceInterface {
 	public List<Location> getAllCountryCity();
 
 	public List<Location> getTopTenCity();
+
+	public String deleteImage(String relativePath);
 
 }

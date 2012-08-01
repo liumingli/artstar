@@ -95,8 +95,8 @@ public class ApiAdaptor {
 		return result;
 	}
 	
-	public String getMuseumBy(String page, String country) {
-		List<Museum> resList = artService.getMuseumBy(page,country);
+	public String getMuseumBy(String page, String location) {
+		List<Museum> resList = artService.getMuseumBy(page,location);
 		JSONArray jsonArray = JSONArray.fromCollection(resList);
 	    processPath(jsonArray);
 		return jsonArray.toString();
@@ -105,6 +105,11 @@ public class ApiAdaptor {
 	public String uploadShot(String srcPath, String width, String height,
 			String x, String y) {
 		String res = artService.uploadShot(srcPath,width,height,x,y);
+		return res;
+	}
+	
+	public String deleteImage(String relativePath) {
+		String res = artService.deleteImage(relativePath);
 		return res;
 	}
 	
@@ -117,6 +122,8 @@ public class ApiAdaptor {
 		List<Location> list = artService.getTopTenCity();
 		return  JSONArray.fromCollection(list).toString();
 	}
+	
+	
 
 
 } // end of class
