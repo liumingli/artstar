@@ -18,7 +18,7 @@ RBT.Earth = function(container){//container:DIV
 	 var geometry, material, meshPlanet;
 	 var objects = [];		 
 
-	 //�����Ƕȣ�Ĭ����������90�ȣ������
+	 //相机所处角度，默认是在西经90度，赤道上
 	 var _cameraLon = -Math.PI;
 	 var _cameraLat = 0;
 	 
@@ -27,27 +27,27 @@ RBT.Earth = function(container){//container:DIV
 	 var flyingTracks = [];
 	 var trackPtIndex = 0;
 	 
-	//����㷨���ˣ�����@2012/07/27
-	 this.flyTo = function(lon, lat){//lat, γ�� lon, ����
-		 //ת���ɻ��Ƚ��м���
+	//这个算法对了！！！@2012/07/27
+	 this.flyTo = function(lon, lat){//lat, 纬度 lon, 经度
+		 //转换成弧度进行计算
 		lon = toRadius(-lon);
 		lat = toRadius(lat);
 		
-		//�����һ�εĹ켣��
+		//清空上一次的轨迹点
 		flyingTracks = flyingTracks.splice(0, 0);
 		
-		//��ʼλ����Ŀ��λ�þ��Ȳ�
+		//起始位置与目标位置经度差
 		var lonDelta = lon - _cameraLon;
-		//��ʼλ����Ŀ��λ��γ�Ȳ�
+		//起始位置与目标位置纬度差
 		var latDelta = lat - _cameraLat;
-		//�����˶�������
+		//经向运动步长数
 		var lonSteps = Math.round(lonDelta/flyingSpeed);
 		var latSteps = Math.round(latDelta/flyingSpeed);
 		var trackPtNum = Math.max(lonSteps, latSteps);
 		var lonMoveSpeed = lonDelta/trackPtNum;
 		var latMoveSpeed = latDelta/trackPtNum;
 			
-		//TODO, �������Ĺ켣��
+		// 保存飞翔的轨迹点
 		for(var i=0; i<trackPtNum; i++){
 			var nextPtLon = _cameraLon + lonMoveSpeed*i;
 			var nextPtLat = _cameraLat + latMoveSpeed*i;
@@ -66,9 +66,10 @@ RBT.Earth = function(container){//container:DIV
 		
 		if(flyingTracks.length>0){
 			flyStartFlag = true;
+			controls.noRotate = true;
 		}
 		 
-		 //������ת������Ƕ�
+		 //保持旋转后的相机角度
 		 _cameraLon = lon;
 		 _cameraLat = lat;
 		 
@@ -112,8 +113,8 @@ RBT.Earth = function(container){//container:DIV
 		    cube.id = id;
 		    cube.name = name;
 		    
-		    //����֤���˹�ʽ��ȫ��ȡ��
-		    //��������γΪ��������γΪ��
+		    //经验证，此公式完全争取：
+		    //东经、北纬为正，西经南纬为负
 		    //2012/07/23
 		    var phi = (90 - lat) * Math.PI / 180;
 		    var theta = -lon * Math.PI / 180;		    	 
@@ -165,8 +166,9 @@ RBT.Earth = function(container){//container:DIV
 			controls.dynamicDampingFactor = 0.3;
 			controls.minDistance = radius * 1.1;
 			controls.maxDistance = radius * 100;	
-//			controls.noZoom = true;			
-			controls.noPan = true;			
+			controls.noZoom = true;			
+			controls.noPan = true;
+			controls.noRotate = true;
 			
 			// planet
 			material = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_2048_meridian _line.jpg' ), overdraw: true } ); 		
@@ -228,7 +230,7 @@ RBT.Earth = function(container){//container:DIV
 	 
 	
 	  function onWindowResize( event ) {
-		  //FIXME, ��ȫ���ߴ���ֹ������ˣ�ŪС��
+		  //FIXME, 用全部尺寸出现滚动条了，弄小点
 		  globeWidth = window.innerWidth-10;
 		  globeHeight = window.innerHeight-10;
 
@@ -250,7 +252,7 @@ RBT.Earth = function(container){//container:DIV
 		  projector.unprojectVector( vector, camera );
 
 		  var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-		  //�������б�
+		  //检查对象列表
 		  var intersects = ray.intersectObjects( objects );
 		  
 		  if ( intersects.length > 0 ) {
@@ -285,15 +287,16 @@ RBT.Earth = function(container){//container:DIV
 		
 		if(trackPtIndex>flyingTracks.length-1) return;
 		
-		//TODO, ȡ���켣�㣬���¶�λ���
+		//取出轨迹点，重新定位相机
 		camera.position = flyingTracks[trackPtIndex];
 		
-		//TODO, �켣����������
+		//轨迹点索引增加
 		trackPtIndex ++;
 		
 		if(trackPtIndex>flyingTracks.length-1){
 			trackPtIndex = 0;
 			flyStartFlag = false;
+			controls.noRotate = false;//allow to rotate...
 		}
 		
 	}//end of move camera
