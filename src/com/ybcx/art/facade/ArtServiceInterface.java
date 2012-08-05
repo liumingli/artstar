@@ -33,6 +33,8 @@ public interface ArtServiceInterface {
 			String x, String y);
 
 	public List<Location> getAllCountryCity();
+	
+	public List<Location> getCityByCountry(String country);
 
 	public List<Location> getTopTenCity();
 

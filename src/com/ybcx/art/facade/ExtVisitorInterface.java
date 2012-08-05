@@ -34,6 +34,9 @@ public interface ExtVisitorInterface {
 	//获取所有的国家和城市
 	public static final String GETALLCOUNTRYCITY = "getAllCountryCity";
 	
+	//根据国家获取城市
+	public static final String GETCITYBYCOUNTRY = "getCityByCountry";
+	
 	//获取排名前十的国家
 	public static final String TOPTENCITY = "topTenCity";
 	

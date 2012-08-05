@@ -112,6 +112,15 @@ public class AssistProcess {
 			pw.print(result);
 			pw.close();
 			
+		}else if (action.equals(AppStarter.GETCITYBYCOUNTRY)) {
+			res.setContentType("text/plain;charset=UTF-8");
+			PrintWriter pw = res.getWriter();
+			String country = req.getParameter("country");
+			String result= apiAdaptor.getCityByCountry(country);
+			log.debug(result);
+			pw.print(result);
+			pw.close();
+			
 		}else if (action.equals(AppStarter.TOPTENCITY)) {
 			res.setContentType("text/plain;charset=UTF-8");
 			PrintWriter pw = res.getWriter();
