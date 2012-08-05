@@ -42,7 +42,7 @@
 	img#shotImg{
 		padding: 1px; /* 越大高度越高*/
 		margin-top:0px;
-		margin-left:50px;/* a blank between label and input*/
+		margin-left:70px;/* a blank between label and input*/
 	}
 	input:required {outline: 1px blue solid; color:red;}/* 为特定属性加样式 */
 	input.short { margin-bottom:4px; width:130px; padding: 2px; }

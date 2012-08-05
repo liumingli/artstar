@@ -131,8 +131,12 @@
 			}else{
 				$(".ui-dialog-buttonpane").append('<p id="loadingtxt" style="text-align:center;"><img src="icons/ok.png"></p>');					
 				//给地点下拉列表添加上
-				$("#country").append("<option value="+cntrEN+" selected>"+cntrCN+"</option>");
-				$("#city").append("<option value="+cityEN+" selected>"+cityCN+"</option>");
+				if(!isDuplicate(cntrEN,"country")){
+					$("#country").append("<option value="+cntrEN+" selected>"+cntrCN+"</option>");
+				}
+				if(!isDuplicate(cityEN,"city")){
+					$("#city").append("<option value="+cityEN+" selected>"+cityCN+"</option>");
+				}
 			}
 		});
 	}
