@@ -118,6 +118,11 @@ public class ApiAdaptor {
 		return JSONArray.fromCollection(list).toString();
 	}
 	
+	public String getCityByCountry(String country) {
+		List<Location> list = artService.getCityByCountry(country);
+		return JSONArray.fromCollection(list).toString();
+	}
+	
 	public String getTopTenCity() {
 		List<Location> list = artService.getTopTenCity();
 		return  JSONArray.fromCollection(list).toString();

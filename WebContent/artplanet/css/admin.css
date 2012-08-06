@@ -1,0 +1,84 @@
+	body {
+		font-size: 62.5%; /*所有的字体都减小*/
+	}
+	h1 {
+		color:#5999DE;
+		text-align:center;
+		font-size: 2.4em;
+		margin: .6em 0;
+	}	
+	h2 {
+		color:#666666;
+		text-align:center;
+	}
+	form.outter {		
+		margin:auto;/*center the form*/
+		padding-top:5px;
+		min-width: 300px;
+		max-width: 500px;
+		width: 400px;
+		border:1px solid #ccc;
+		background-color:#d5e4f3;
+	}
+	form.opened{
+		width: 250px;
+		height: 150px;
+		padding: 0;
+	}
+	label {
+		color:#666666;
+		float: left;
+		width: 60px;/* 这个宽度很重要啊，否则对不齐了，包括弹出的窗口*/
+		padding: 0;
+		margin-top:4px;
+		text-align: right;
+	}
+	input {
+		padding: 1px; /* 越大高度越高*/
+		margin-top:0px;
+		margin-left:10px;/* a blank between label and input*/
+		width: 250px;
+	}
+	img#shotImg{
+		padding: 1px; /* 越大高度越高*/
+		margin-top:0px;
+		margin-left:70px;/* a blank between label and input*/
+	}
+	input:required {outline: 1px blue solid; color:red;}/* 为特定属性加样式 */
+	input.short { margin-bottom:4px; width:130px; padding: 2px; }
+	
+	select {
+		margin-left:10px;/* a blank between label and input*/
+		width: 100px;
+	}
+	textarea {
+		width: 250px;
+		height: 100px;
+		max-width: 300px;
+		max-height: 100px;
+		margin-left:10px;
+		padding: 2px; 
+		resize: none;
+	}	
+	
+
+	.validateTips { border: 1px solid transparent; padding: 0.3em; }	
+	
+	.entry {
+		margin-top:.5em;
+		margin-bottom:.5em;
+	}
+	.button {
+		float: right;
+		padding-right:50px;
+		padding-bottom:5px;
+		padding-top:5px;
+	}
+	.addcity {
+		padding-left:2px;			
+	}
+		
+	#create-city{
+			vertical-align:text-bottom;
+	}
+		

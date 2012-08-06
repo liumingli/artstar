@@ -150,6 +150,28 @@ public class DBAccessImplement  implements DBAccessInterface {
 		}
 		return resList;
 	}
+	
+	@Override
+	public List<Location> getCityByCountry(String country) {
+		List<Location> resList = new ArrayList<Location>();
+		String sql = "select * from citylocation where cl_country='"+country+"' order by cl_city";
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+		if (rows != null && rows.size() > 0) {
+			for (int i = 0; i < rows.size(); i++) {
+				Map<String, Object> map = (Map<String, Object>) rows.get(i);
+				Location loc = new Location();
+				loc.setId(map.get("cl_id").toString());
+				loc.setCity(map.get("cl_city").toString());
+				loc.setCountry(map.get("cl_country").toString());
+				loc.setCityCN(map.get("cl_cityCN").toString());
+				loc.setCountryCN(map.get("cl_countryCN").toString());
+				loc.setLatitude(map.get("cl_latitude").toString());
+				loc.setLongitude(map.get("cl_longitude").toString());
+				resList.add(loc);
+			}
+		}
+		return resList;
+	}
 
 	@Override
 	public List<Location> getTopTenCity() {
