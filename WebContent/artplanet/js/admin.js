@@ -5,12 +5,6 @@
 		//初始化下拉选框
 		initSelectOptions();
 		
-		//create datepicker components...
-		$( "#datepicker_start" ).datepicker();
-		$( "#datepicker_start" ).datepicker("option", "dateFormat","yy-mm-dd");
-		$( "#datepicker_end" ).datepicker();
-		$( "#datepicker_end" ).datepicker("option", "dateFormat","yy-mm-dd");
-		
 		//art event form elements...
 		var museumName = $("#museumName"), country = $("#country"), city = $("#city"), shotPath = $("#shotPath"), url = $("#url"), description = $("#description"); 
 				
