@@ -22,9 +22,9 @@
 				//提交
 				createMuseum(museumName.val(),country.val(),city.val(),shotPath.val(),url.val(),description.val());
 				//清空表单
-				clearFormInputs(museumName,country,city,shotPath,url,description);
+				clearFormInputs(museumName,shotPath,url,description);
 				//show the loading image...
-				$('#subm').attr("style","visibility:visible");
+				$('#subm').attr("style","visibility:hidden");
 			}else{
 				$('#subm').attr("style","visibility:visible");
 				$('#subm').children().remove();
