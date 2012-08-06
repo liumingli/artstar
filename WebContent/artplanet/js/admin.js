@@ -188,7 +188,10 @@
 	
 	//TODO, submit the art event...
 	function createMuseum(museumName,country,city,shotPath,url,description){
-		console.log("send art event details...");	
+		if(ias != null){
+			ias.cancelSelection();
+			console.log("cancelSelection submit");
+		}
 		$.post('/artstar/artapi', {
 			'method' : 'addArtMuseum',
 			'name' : museumName,
@@ -230,7 +233,6 @@
 		for(var i=0; i<params.length; i++){
 			//clear input value...
 			var val = params[i].attr("value");
-			console.log(val);
 			if(val == null || val == ""){
 				flag = false;
 			}
@@ -319,9 +321,9 @@
 		}, 
 		//回调函数
 		function (result) {
-			console.log("cancelSelection");
 			if(ias != null){
 				ias.cancelSelection();
+				console.log("cancelSelection>>>");
 			}
 			
 			if(result == "false"){
@@ -342,6 +344,7 @@
 		//删除选择框
 		if(ias != null){
 			ias.cancelSelection();
+			console.log("cancelSelection reelect");
 		}
 		$('#shotImg').remove();
 		$('#opt').remove();
