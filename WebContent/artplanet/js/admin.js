@@ -1,6 +1,6 @@
 	//main function...
 	$(function() {
-		
+		console.log("main function...");
 		//fill country/city select options...
 		//初始化下拉选框
 		initSelectOptions();
@@ -110,6 +110,51 @@
 		},"json");
 		
 	}
+	
+	
+	window.onload = function(){
+		console.log("window onload...");
+		$('#fileUpload').fileupload({
+			add : function(e, data) {
+				var fileName = data.files[0].name;
+				var regexp = /\.(png)|(jpg)|(gif)$/i;
+			    if (!regexp.test(fileName)) {
+			    	  $('#fileInfo').show().html('<img src="icons/no.png">');
+			    }else{
+					var jqXHR = data.submit().success(
+							function(result, textStatus, jqXHR) {
+								if(result == "reject"){
+								    $('#fileInfo').show().html('<img src="icons/no.png">');
+								}else{
+									$('#shotPath').val(result);
+									$('#fileInfo').show().html('<img src="icons/ok.png">');
+									
+									//禁用文件上传
+									//$('#fileUpload').attr("style","visibility:hidden");
+									$('#fileUpload').attr('disabled','disabled');
+									
+									//可以框选图片的操作
+									var html = '<img id="shotImg" src="/artstar/artapi?method=getMuseumShot&relativePath='+result+'">';
+									html += '<div align="center" id="opt"><button onclick="saveSelectedImg()">继续</button>';
+									html += '<button onclick="reelect()">重选</button></div>';
+									$('#shot').append(html);
+									
+									//注册可以框选裁剪图片的js
+									initSelectImage();
+									
+								}
+							}).error(
+							function(jqXHR, textStatus, errorThrown) {
+								console.log("error");
+								$('#fileInfo').show().html('<img src="imgs/no.png">');
+							}).complete(
+							function(result, textStatus, jqXHR) {
+								console.log(result);
+							});
+			    }
+			}
+		});
+	};
 	
 	//TODO, submit to backend...
 	function createCityofCountry(cntrCN, cntrEN, cityCN, cityEN, lon, lat){
