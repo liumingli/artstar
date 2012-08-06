@@ -29,6 +29,9 @@ RBT.Earth = function(container){//container:DIV
 	 
 	//这个算法对了！！！@2012/07/27
 	 this.flyTo = function(lon, lat){//lat, 纬度 lon, 经度
+		 //正在飞行时，不能重新设置
+		 if(flyStartFlag) return;
+		 
 		 //转换成弧度进行计算
 		lon = toRadius(-lon);
 		lat = toRadius(lat);
@@ -43,10 +46,11 @@ RBT.Earth = function(container){//container:DIV
 		//经向运动步长数
 		var lonSteps = Math.round(lonDelta/flyingSpeed);
 		var latSteps = Math.round(latDelta/flyingSpeed);
-		var trackPtNum = Math.max(lonSteps, latSteps);
+		//FIXME, 这个移动步数必须是正值
+		//2012/08/06
+		var trackPtNum = Math.max(Math.abs(lonSteps), Math.abs(latSteps));
 		var lonMoveSpeed = lonDelta/trackPtNum;
 		var latMoveSpeed = latDelta/trackPtNum;
-			
 		// 保存飞翔的轨迹点
 		for(var i=0; i<trackPtNum; i++){
 			var nextPtLon = _cameraLon + lonMoveSpeed*i;
@@ -60,8 +64,7 @@ RBT.Earth = function(container){//container:DIV
 			var rotateEnd = new THREE.Vector3( endX, endY, endZ );
 			flyingTracks.push(rotateEnd);
 			
-			//console.log("add pt "+i+": "+endX+"/"+endY+"/"+endZ);			
-			
+			//console.log("add pt "+i+": "+endX+"/"+endY+"/"+endZ);				
 		}
 		
 		if(flyingTracks.length>0){
@@ -230,11 +233,11 @@ RBT.Earth = function(container){//container:DIV
 	 
 	
 	  function onWindowResize( event ) {
-		  //FIXME, 用全部尺寸出现滚动条了，弄小点
+		  //FIXME, 将来部署到服务器时，得按照新浪应用大小要求，写死一个大小；
+		  //2012/08/06
 		  globeWidth = window.innerWidth-10;
 		  globeHeight = window.innerHeight-10;
 
-		
 		  renderer.setSize( globeWidth, globeHeight );
 		  camera.aspect = globeWidth / globeHeight;
 		  camera.updateProjectionMatrix();

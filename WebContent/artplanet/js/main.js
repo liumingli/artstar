@@ -1,5 +1,79 @@
 //--------  UTF-8 encode needed ---------
 //---- 2012/07/01 ----
+
+//当前取到的城市列表数据
+var topTen;
+
+function queryTopTenCities(){
+	$.post('/artstar/artapi',{
+		'method' : 'topTenCity'
+	},function(result){
+		topTen = result;		
+		if(topTen.length>0){
+			for(var i=0; i<topTen.length; i++){
+				var cityObj = topTen[i];
+				var link = "<a href='javascript:;' id='"+cityObj['city']+"'>"+cityObj['cityCN']+"</a><br/>";
+				$("#citylinks").append(link);
+				addClickEvent(cityObj['city'], cityObj['longitude'], cityObj['latitude']);				
+			}
+		}
+	},"json");
+}
+
+function addClickEvent(id, lon, lat){
+	
+	$("#"+id).click(function(){
+		//按照城市，查询该城市的艺术馆
+		$.post('/artstar/artapi',{
+			'method' : 'getMuseumBy','location' : id, 'page' : '1'
+		},function(result){
+			if(result.length>0){
+				$("#museumlist").empty();						
+				for(var i=0; i<result.length; i++){
+					var museum = result[i];
+					createMuseum(museum);
+				}
+			}
+		},"json");
+		//TODO, FLYTO ...				
+		var lonlat = getLonLatValue(id);
+		var lon = lonlat.split(",")[0];
+		var lat = lonlat.split(",")[1];
+		trace("lon/lat:"+lon+"/"+lat);
+		planet.flyTo(lon, lat);
+	});
+}
+
+function getLonLatValue(city){
+	var pos;
+	for(var i=0; i<topTen.length; i++){
+		var cityObj = topTen[i];
+		if(city==cityObj['city']){
+			pos = cityObj['longitude']+","+cityObj['latitude'];
+			break;
+		}		
+	}
+	return pos;
+}
+
+function createMuseum(museum){		
+	$("#museumlist").append(museum['name']+"<br/>"+museum['officialUrl']+"<br/>");
+}
+		
+function createCubes(){
+	var color = new THREE.Color( 0xFF0000);
+	//----------- beijing -----------------to add more... 
+	planet.createCube(116.4, 39.9, 0.05, color, "123", "beijing");
+	//----------- london ---------------
+	planet.createCube(0.1, 51.3, 0.05, color, "234", "london");	
+	//----------- wengehua -----------
+	planet.createCube(-123.1, 49.2, 0.05, color, "345", "wengehua");
+	//----------- xini ------------------
+	planet.createCube(151.1, -33.5, 0.05, color, "456", "xini");
+
+}	
+
+
 function createEventsToday(){
 	//动态创建事件条目
 	var eventName = "艺术北京即将举行！";
@@ -20,47 +94,10 @@ function createEventsToday(){
 }
 
 function emptyEventList(){
-	$("#eventlist").empty();
-}
-
-function createLeftMenus(){
-	$("#todayevents").click(function(){
-		renderMenuLinkSelect(this);
-		createEventsToday();
-	});
-	$("#thisweekevents").click(function(){
-		renderMenuLinkSelect(this);
-		emptyEventList();
-	});
-	$("#nextweekevents").click(function(){
-		renderMenuLinkSelect(this);
-		emptyEventList();
-	});
-	$("#thismonthevents").click(function(){
-		renderMenuLinkSelect(this);
-		emptyEventList();
-	});
-	$("#nextmonthevents").click(function(){
-		renderMenuLinkSelect(this);
-		emptyEventList();
-	});
-	
-	//默认载入今日数据...
-	renderMenuLinkSelect($("#todayevents"));			
+	$("#citylist").empty();
 }
 
 
-function renderMenuLinkSelect(selecta){			
-	//先清掉所有链接样式
-	$("#todayevents").removeClass("linkselected");
-	$("#thisweekevents").removeClass("linkselected");
-	$("#nextweekevents").removeClass("linkselected");
-	$("#thismonthevents").removeClass("linkselected");
-	$("#nextmonthevents").removeClass("linkselected");			
-				
-	//添加选中样式
-	$(selecta).addClass("linkselected");
-}
 
 function resetInput(){
 	$("#searchinput").attr("value", "");//清空
