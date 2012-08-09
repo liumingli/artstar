@@ -95,9 +95,7 @@ function resetInput(){
 function createMuseumElement(museum){
 	var msmName = museum['name'];
 	var shortPath = museum['shotPath'];
-	trace(msmName+":"+shortPath);
-	//FIXME, 这个路径不全，补上
-	shortPath = "\\short\\"+shortPath;
+	trace(msmName+":"+shortPath);	
 	var shotUrl = '/artstar/artapi?method=getMuseumShot&relativePath='+shortPath;
 	var description = museum['description'];
 	var officialUrl = museum['officialUrl'];
