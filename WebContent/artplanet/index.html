@@ -23,13 +23,17 @@
 			}			
 			container = document.getElementById("container");	
 			
-			//TODO, Planet init...
+			//Planet init...
 			planet = new RBT.Earth(container);
-			planet.run();//start 3d engine...
+			
+			//...start 3d engine manually...
+			planet.run();
+			
 			planet.onMeshClick = function(id,name){
 			//	console.log("the mesh is: "+id+"/"+name);
 			}				
-			//-------- 未飞行之前的默认位置(-90, 0) -----------------
+			//-------- 未飞行之前的默认位置(-90, 0) ----------
+			//planet.flyTo(-90, 0);
 			//-------- 北京 -----------------			
 			planet.flyTo(116, 40);
 			

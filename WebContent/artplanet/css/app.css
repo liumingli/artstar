@@ -36,7 +36,7 @@
         width: 100px;
         padding: 10px;       
         font-size: 16px;
-        line-height: 200%;
+        line-height: 200%;/* 链接间距增加 */
       }
       #searchdiv {
       	 position: absolute;

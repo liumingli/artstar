@@ -14,13 +14,16 @@ function queryTopTenCities(){
 				var cityObj = topTen[i];
 				var link = "<a href='javascript:;' id='"+cityObj['city']+"'>"+cityObj['cityCN']+"</a><br/>";
 				$("#citylinks").append(link);
-				addClickEvent(cityObj['city'], cityObj['longitude'], cityObj['latitude']);				
+				//添加点击事件
+				addClickEvent(cityObj['city']);
+				//把城市定位到地球上
+				createCube(cityObj['longitude'], cityObj['latitude'],cityObj['city']);
 			}
 		}
 	},"json");
 }
 
-function addClickEvent(id, lon, lat){
+function addClickEvent(id){
 	
 	$("#"+id).click(function(){
 		//按照城市，查询该城市的艺术馆
@@ -35,11 +38,11 @@ function addClickEvent(id, lon, lat){
 				}
 			}
 		},"json");
-		//TODO, FLYTO ...				
+		//Click to FLYTO ...				
 		var lonlat = getLonLatValue(id);
 		var lon = lonlat.split(",")[0];
 		var lat = lonlat.split(",")[1];
-		trace("lon/lat:"+lon+"/"+lat);
+//		trace("lon/lat:"+lon+"/"+lat);
 		planet.flyTo(lon, lat);
 	});
 }
@@ -56,20 +59,20 @@ function getLonLatValue(city){
 	return pos;
 }
 
+
 function createMuseum(museum){		
 	$("#museumlist").append(museum['name']+"<br/>"+museum['officialUrl']+"<br/>");
 }
 		
-function createCubes(){
-	var color = new THREE.Color( 0xFF0000);
-	//----------- beijing -----------------to add more... 
-	planet.createCube(116.4, 39.9, 0.05, color, "123", "beijing");
-	//----------- london ---------------
-	planet.createCube(0.1, 51.3, 0.05, color, "234", "london");	
-	//----------- wengehua -----------
-	planet.createCube(-123.1, 49.2, 0.05, color, "345", "wengehua");
-	//----------- xini ------------------
-	planet.createCube(151.1, -33.5, 0.05, color, "456", "xini");
+function createCube(lon, lat, city){
+	var color = new THREE.Color( 0x00FF00);
+	lon = Number(lon);
+	lat = Number(lat);
+	planet.createCube(lon, lat, 0.1, 0, color, city, city);
+	
+//	planet.createCube(0.1, 51.3, 0.05, color, "234", "london");	
+//	planet.createCube(-123.1, 49.2, 0.05, color, "345", "wengehua");
+//	planet.createCube(151.1, -33.5, 0.05, color, "456", "xini");
 
 }	
 
