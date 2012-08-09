@@ -115,19 +115,16 @@ RBT.Earth = function(container){//container:DIV
 	  * @param name, name of cube, string;
 	  */	 
 	 this.createCube = function (lon, lat, size, height, color, id, name){
-		   var geometry = new THREE.CubeGeometry(0.75, 0.75, 1, 1, 1, 1, null, false, { px: true,
-		          nx: true, py: true, ny: true, pz: false, nz: true});
+		 
+		 	var materials = [];
 
-		    for (var i = 0; i < geometry.vertices.length; i++) {
-		      var vertex = geometry.vertices[i];
-		      vertex.z += height;
-		    }
-		    var material = new THREE.MeshBasicMaterial({
-	            color: 0xffffff,
-	            vertexColors: THREE.FaceColors,
-	            morphTargets: false
-	          });
-		    var cube = new THREE.Mesh(geometry,material);
+			for ( var i = 0; i < 6; i ++ ) {
+				materials.push( new THREE.MeshBasicMaterial( { color: color } ) );
+			}
+		 
+		   var geometry = new THREE.CubeGeometry(1*size, 1*size, 1*size, 1, 1, 1, materials);
+		   
+		    var cube = new THREE.Mesh(geometry,new THREE.MeshFaceMaterial() );
 		    cube.id = id;
 		    cube.name = name;
 		    
@@ -143,14 +140,9 @@ RBT.Earth = function(container){//container:DIV
 		    
 		    cube.lookAt(meshPlanet.position);
 		    
-		    size = size*radius;
-		    cube.scale.z = -size;
+		    //grow tall...
+		    cube.scale.z = height*radius;
 		    cube.updateMatrix();
-
-		    var i;
-		    for (i = 0; i < cube.geometry.faces.length; i++) {
-		    	cube.geometry.faces[i].color = color;
-		    }
 
 		    scene.add(cube);
 		    objects.push(cube);

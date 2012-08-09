@@ -1,5 +1,7 @@
 	 html {
 	     height: 100%;
+	     overflow-x:hidden; /* 水平滚动条禁用 */
+		 /*overflow-y:hidden;*/ 
 	 }
 	    
      body {
@@ -50,9 +52,12 @@
       	 position: absolute;
          top: 60px;
          right: 10px;        
-         width: 270px;         
+         width: 270px;
+         height: 600px;        
          padding: 0px;
          font-size: 12px;
+         overflow-y:auto;
+
          /* border: 1px solid #FF0000; */          
       }
       

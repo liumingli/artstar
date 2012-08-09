@@ -34,7 +34,7 @@ function addClickEvent(id){
 				$("#museumlist").empty();						
 				for(var i=0; i<result.length; i++){
 					var museum = result[i];
-					createMuseum(museum);
+					addMuseum(museum);
 				}
 			}
 		},"json");
@@ -60,58 +60,48 @@ function getLonLatValue(city){
 }
 
 
-function createMuseum(museum){		
-	$("#museumlist").append(museum['name']+"<br/>"+museum['officialUrl']+"<br/>");
+function addMuseum(museum){
+	var msmElement = createMuseumElement(museum);
+	$("#museumlist").append(msmElement);
 }
-		
+
+/**
+ * 要根据场馆的多少，指定柱子的大小
+ * @param lon, longitude
+ * @param lat, latitude
+ * @param city, city name in english
+ */
 function createCube(lon, lat, city){
-	var color = new THREE.Color( 0x00FF00);
+	var color = 0x00FF00;
 	lon = Number(lon);
 	lat = Number(lat);
-	planet.createCube(lon, lat, 0.1, 0, color, city, city);
+	planet.createCube(lon, lat, 2, 0.1, color, city, city);
 	
 //	planet.createCube(0.1, 51.3, 0.05, color, "234", "london");	
 //	planet.createCube(-123.1, 49.2, 0.05, color, "345", "wengehua");
 //	planet.createCube(151.1, -33.5, 0.05, color, "456", "xini");
 
-}	
-
-
-function createEventsToday(){
-	//动态创建事件条目
-	var eventName = "艺术北京即将举行！";
-	var address = "北京 中国";
-	var startTime = "2012/05/01";
-	var endTime = "2012/05/03";
-	var description = "每年举行一次的艺术盛会，来自全球的艺术团体为大家奉上精美的艺术大餐，不可错过啊。。。";
-	var officialUrl = "http://ipintu.com";
-	var eventItem = createEventItem(eventName, address, startTime, endTime, description, officialUrl);
-	$("#eventlist").append(eventItem);
-	var anotherEvent = createEventItem(eventName, address, startTime, endTime, description, officialUrl);
-	$("#eventlist").append(anotherEvent);
-	var thridEvent = createEventItem(eventName, address, startTime, endTime, description, officialUrl);
-	$("#eventlist").append(thridEvent);
-	
-	//TODO, ADD EVENT CUBE ON PLANET...
-	
 }
 
 function emptyEventList(){
 	$("#citylist").empty();
 }
 
-
-
 function resetInput(){
 	$("#searchinput").attr("value", "");//清空
 	$("#searchinput").removeClass("short");//恢复样式
 }
 
-function trace(msg){
-	console.log(msg);
-}
-
-function createEventItem(eventName, address, startTime, endTime, description, officialUrl){
+function createMuseumElement(museum){
+	var msmName = museum['name'];
+	var shortPath = museum['shotPath'];
+	trace(msmName+":"+shortPath);
+	//FIXME, 这个路径不全，补上
+	shortPath = "\\short\\"+shortPath;
+	var shotUrl = '/artstar/artapi?method=getMuseumShot&relativePath='+shortPath;
+	var description = museum['description'];
+	var officialUrl = museum['officialUrl'];
+	
 	var div = document.createElement("div");
 	//底部加一个边线
 	div.style.borderBottom = "1px solid rgba(255,255,255,0.4)"
@@ -120,16 +110,20 @@ function createEventItem(eventName, address, startTime, endTime, description, of
 	eventNode.style.fontSize = "14px";
 	eventNode.style.color = "#FFFFFF";
 	eventNode.style.fontWeight = "bold";
-	eventNode.innerHTML = eventName;
+	eventNode.innerHTML = msmName;
 	div.appendChild(eventNode);			
 	//----- content ------
 	var content = document.createElement("p");
 	content.style.color = "#FFFFFF";
 	div.appendChild(content);
 	
-	content.innerHTML = "地址："+address+"<br/>"
-									+"时间："+startTime+"--"+endTime+"<br/>"
-									+description+"<br/>"
-									+"<a href='"+officialUrl+"' target='_blank'>更多...</a>";			
+	content.innerHTML = "<img src='"+shotUrl+"'/>"+"<br/>"
+									+"简介："+description+"<br/><br/>"
+									+"官网："+officialUrl;			
 	return div;
+}
+
+
+function trace(msg){
+	if(console) console.log(msg);
 }
