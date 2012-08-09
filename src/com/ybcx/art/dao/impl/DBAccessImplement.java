@@ -57,7 +57,8 @@ public class DBAccessImplement  implements DBAccessInterface {
 	public List<Museum> getMuseumBy(int pageNum, int pageSize, String location) {
 		List<Museum> resList = new ArrayList<Museum>();
 		int startLine = (pageNum -1)*pageSize;
-		String sql = "select * from apmuseum where am_country = '"+location+"' or am_city='"+location+"' limit "+startLine+","+pageSize;
+		String sql = "select * from apmuseum where am_country = '"+location+"' or am_city='"+location+"' " +
+				"order by CONVERT( am_museumName USING gbk ) limit "+startLine+","+pageSize;
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
 		if (rows != null && rows.size() > 0) {
 			for (int i = 0; i < rows.size(); i++) {

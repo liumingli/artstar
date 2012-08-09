@@ -1,15 +1,9 @@
 	//main function...
 	$(function() {
-		
+		console.log("main function...");
 		//fill country/city select options...
 		//初始化下拉选框
 		initSelectOptions();
-		
-		//create datepicker components...
-		$( "#datepicker_start" ).datepicker();
-		$( "#datepicker_start" ).datepicker("option", "dateFormat","yy-mm-dd");
-		$( "#datepicker_end" ).datepicker();
-		$( "#datepicker_end" ).datepicker("option", "dateFormat","yy-mm-dd");
 		
 		//art event form elements...
 		var museumName = $("#museumName"), country = $("#country"), city = $("#city"), shotPath = $("#shotPath"), url = $("#url"), description = $("#description"); 
@@ -22,9 +16,9 @@
 				//提交
 				createMuseum(museumName.val(),country.val(),city.val(),shotPath.val(),url.val(),description.val());
 				//清空表单
-				clearFormInputs(museumName,country,city,shotPath,url,description);
+				clearFormInputs(museumName,shotPath,url,description);
 				//show the loading image...
-				$('#subm').attr("style","visibility:visible");
+				$('#subm').attr("style","visibility:hidden");
 			}else{
 				$('#subm').attr("style","visibility:visible");
 				$('#subm').children().remove();
@@ -111,6 +105,51 @@
 		
 	}
 	
+	
+	window.onload = function(){
+		console.log("window onload...");
+		$('#fileUpload').fileupload({
+			add : function(e, data) {
+				var fileName = data.files[0].name;
+				var regexp = /\.(png)|(jpg)|(gif)$/i;
+			    if (!regexp.test(fileName)) {
+			    	  $('#fileInfo').show().html('<img src="icons/no.png">');
+			    }else{
+					var jqXHR = data.submit().success(
+							function(result, textStatus, jqXHR) {
+								if(result == "reject"){
+								    $('#fileInfo').show().html('<img src="icons/no.png">');
+								}else{
+									$('#shotPath').val(result);
+									$('#fileInfo').show().html('<img src="icons/ok.png">');
+									
+									//禁用文件上传
+									//$('#fileUpload').attr("style","visibility:hidden");
+									$('#fileUpload').attr('disabled','disabled');
+									
+									//可以框选图片的操作
+									var html = '<img id="shotImg" src="/artstar/artapi?method=getMuseumShot&relativePath='+result+'">';
+									html += '<div align="center" id="opt"><button onclick="saveSelectedImg()">继续</button>';
+									html += '<button onclick="reelect()">重选</button></div>';
+									$('#shot').append(html);
+									
+									//注册可以框选裁剪图片的js
+									initSelectImage();
+									
+								}
+							}).error(
+							function(jqXHR, textStatus, errorThrown) {
+								console.log("error");
+								$('#fileInfo').show().html('<img src="imgs/no.png">');
+							}).complete(
+							function(result, textStatus, jqXHR) {
+								console.log(result);
+							});
+			    }
+			}
+		});
+	};
+	
 	//TODO, submit to backend...
 	function createCityofCountry(cntrCN, cntrEN, cityCN, cityEN, lon, lat){
 		console.log("saving city to backend...");
@@ -143,7 +182,10 @@
 	
 	//TODO, submit the art event...
 	function createMuseum(museumName,country,city,shotPath,url,description){
-		console.log("send art event details...");	
+		if(ias != null){
+			ias.cancelSelection();
+			console.log("cancelSelection submit");
+		}
 		$.post('/artstar/artapi', {
 			'method' : 'addArtMuseum',
 			'name' : museumName,
@@ -185,7 +227,6 @@
 		for(var i=0; i<params.length; i++){
 			//clear input value...
 			var val = params[i].attr("value");
-			console.log(val);
 			if(val == null || val == ""){
 				flag = false;
 			}
@@ -274,9 +315,9 @@
 		}, 
 		//回调函数
 		function (result) {
-			console.log("cancelSelection");
 			if(ias != null){
 				ias.cancelSelection();
+				console.log("cancelSelection>>>");
 			}
 			
 			if(result == "false"){
@@ -297,6 +338,7 @@
 		//删除选择框
 		if(ias != null){
 			ias.cancelSelection();
+			console.log("cancelSelection reelect");
 		}
 		$('#shotImg').remove();
 		$('#opt').remove();
