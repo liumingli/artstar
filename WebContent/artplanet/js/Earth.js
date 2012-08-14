@@ -180,15 +180,14 @@ RBT.Earth = function(container){//container:DIV
 			controls.noPan = true;
 			controls.noRotate = true;
 			controls.addEventListener('change', onCamerMoved);
+			
 			// planet
 			material = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_2048_meridian _line.jpg' ), overdraw: true } ); 		
 			geometry = new THREE.SphereGeometry( radius, 100, 50 );
 			geometry.computeTangents();
-
-			meshPlanet = new THREE.Mesh( geometry, material );		
-			
+			meshPlanet = new THREE.Mesh( geometry, material );					
 			scene.add( meshPlanet );
-			
+
 			// stars
 			var starsGeometry = new THREE.Geometry();
 

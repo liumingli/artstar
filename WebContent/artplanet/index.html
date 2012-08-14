@@ -8,17 +8,10 @@
 	
 	<script src="jquery/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="js/Three.js"></script>
-	<script type="text/javascript" src="js/OrbitControls.js"></script>
 	<script type="text/javascript" src="js/Detector.js"></script>
 	<script type="text/javascript" src="js/Earth.js"></script>
-	<script type="text/javascript" src="js/main.js"></script>
+	<script type="text/javascript" src="js/main.js" ></script>
 	<script type="text/javascript">
-	
-	//禁止滚动条
-	 $(document.body).css({
-	    "overflow-x":"hidden",
-	    "overflow-y":"hidden"
-	 });
 	
 		var container, planet;
 		
@@ -43,10 +36,8 @@
 			//-------- 北京 -----------------			
 			planet.flyTo(116, 40);
 			
-			//TODO, 查询TOP10城市
-			queryTopTenCities();
-			
-			//TODO, 查询第一个城市的艺术馆
+			//查询TOP10城市
+			queryTopTenCities();						
 			
 			
 		} //end of app initialize...
@@ -71,12 +62,20 @@
 	 <div id="searchdiv">
 		 <form onsubmit="return false;">  
 	  		<input type="text" name="searchinput" id="searchinput" class="short" 
-	  			placeholder="输入艺术事件关键字" />
-	  		<input type="button" value="查 询" class="button"/>
+	  			placeholder="输入艺术事件关键字"/>
+	  		<input id="querybtn" type="button" value="查 询" class="button" onclick="searchMuseumBy()"/>
+	  		<span  style="display: none;" id="prompt"><font color="white">loading...</font></span>
 		 </form>
 	 </div>
-	 <!-- 右侧：选择的艺术场馆列表 -->
+    <!-- 右侧：选择的艺术场馆列表 -->
 	 <div id="museumlist">	
 	 </div>
+	 <div id="footer">
+        @ 2012 北京远博畅享科技有限公司
+        <a href="http://rainbirdtech.com" target="_blank">首页</a>|
+        <a href="http://ipintu.com" target="_blank">爱品图</a>|
+        <a href="http://ipintu.com/ipintu/miniad/index.html" target="_blank">报雨鸟微广告</a>|
+        <a href="mailto:contact@ipintu.com">联系我们</a>
+    </div>
 </body>
 </html>

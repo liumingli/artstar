@@ -18,6 +18,25 @@ function queryTopTenCities(){
 				addClickEvent(cityObj['city']);
 				//把城市定位到地球上
 				createCube(cityObj['longitude'], cityObj['latitude'],cityObj['city']);
+				//查询第一个城市的场馆
+				getFirstCityMuseums();
+			}
+		}
+	},"json");
+}
+
+function getFirstCityMuseums(){
+	if(!topTen) return;
+	
+	var city = topTen[0]["city"];
+	$.post('/artstar/artapi',{
+		'method' : 'getMuseumBy','location' : city, 'page' : '1'
+	},function(result){
+		if(result.length>0){
+			$("#museumlist").empty();						
+			for(var i=0; i<result.length; i++){
+				var museum = result[i];
+				addMuseum(museum);
 			}
 		}
 	},"json");
@@ -121,6 +140,27 @@ function createMuseumElement(museum){
 	return div;
 }
 
+function searchMuseumBy(){	
+	var keywords = $('#searchinput').val().trim();
+	if(keywords==null || keywords.length==0) return;
+	//show loading...
+	$('#prompt').show();
+	$('#querybtn').attr("disabled","true");
+	
+	$.post('/artstar/artapi',
+			{'method' : 'searchMuseumBy','key' : keywords},
+			function(result){
+				if(result.length>0){
+					$("#museumlist").empty();						
+					for(var i=0; i<result.length; i++){
+						var museum = result[i];
+						addMuseum(museum);
+					}
+					$('#prompt').hide();
+					$('#querybtn').removeAttr("disabled");
+				}
+			},"json");
+}
 
 function trace(msg){
 	if(console) console.log(msg);
