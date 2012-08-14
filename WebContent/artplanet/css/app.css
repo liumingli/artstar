@@ -13,7 +13,15 @@
         font-size: 13px;
         line-height: 20px;
         height: 100%;
+        text-align:center; 
       }
+      
+      #loading {   
+      	position:fixed;
+        top: 280px;
+        left: 550px;   
+      }
+      
       #container {
       	position:fixed;
       }

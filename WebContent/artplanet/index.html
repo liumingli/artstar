@@ -6,16 +6,13 @@
 	
 	<link rel="stylesheet" href="css/app.css">
 	
-	<script src="jquery/jquery-1.7.2.min.js"></script>
-	<script type="text/javascript" src="js/Three.js"></script>
-	<script type="text/javascript" src="js/Detector.js"></script>
-	<script type="text/javascript" src="js/Earth.js"></script>
-	<script type="text/javascript" src="js/main.js" ></script>
+	<script src="js/lazyload-min.js"></script>
 	<script type="text/javascript">
+	
 	
 		var container, planet;
 		
-		window.onload = function() {
+		function loadComplete() {
 			if ( !Detector.webgl ) {
 				Detector.addGetWebGLMessage();
 				return;
@@ -39,14 +36,28 @@
 			//查询TOP10城市
 			queryTopTenCities();						
 			
+			//移除加载文字
+			$("#loading").remove();
 			
 		} //end of app initialize...
+		
+		// Load the YUI Dom, Event, and Animation libraries if they haven't already
+		// been loaded.
+		LazyLoad.loadOnce([
+		  'jquery/jquery-1.7.2.min.js',
+		  'js/Three.js',
+		  'js/Detector.js',
+		  'js/Earth.js',
+		  'js/main.js',
+		], loadComplete);
 		
 		
 	</script>
 </head>
 <body>
-	<!-- WebGL容器放在底部 -->
+	<!-- 加载文字 -->
+	<div id="loading" ><font size="4" color="white">loading...</font></div>
+	<!-- WebGL容器放在底部不会盖住其他内容 -->
 	<div id="container"></div>
 	<!-- 标题 -->
 	 <div id="maintitle">
@@ -76,6 +87,6 @@
         <a href="http://ipintu.com" target="_blank">爱品图</a>|
         <a href="http://ipintu.com/ipintu/miniad/index.html" target="_blank">报雨鸟微广告</a>|
         <a href="mailto:contact@ipintu.com">联系我们</a>
-    </div>
+    </div>    
 </body>
 </html>
