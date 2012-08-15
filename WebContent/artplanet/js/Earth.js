@@ -213,7 +213,7 @@ RBT.Earth = function(container){//container:DIV
 				new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 			];
 
-			for ( i = 10; i < 30; i ++ ) {
+			for ( i = 10; i < 300; i ++ ) {
 
 				stars = new THREE.ParticleSystem( starsGeometry, starsMaterials[ i % 6 ] );
 
