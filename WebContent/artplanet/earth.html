@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Test Rotate Earth</title>
+		<style>
+		
+			 html {
+			     height: 100%;
+			     overflow-x:hidden; /* 水平滚动条禁用 */
+				 /*overflow-y:hidden;*/ 
+			 }
+		
+			body {
+				background: #000;				
+				padding: 0;
+				margin: 0;
+				font-weight: bold;
+				overflow: hidden;
+			
+				font-size: 13px;
+				text-align: center;
+			}
+
+			#btns {				
+				position: absolute;				
+				top:100px;
+				left:0px;
+				padding:10px;
+			}
+			
+			.button{
+				border-radius: 6px;/* 去除按钮边缘的白色*/
+				/*-webkit-border-radius: 6px;
+				-moz-border-radius: 6px;		*/	
+				margin-top:10px;			 
+			}
+
+			a { color: green; }
+			b { color: green; }
+		</style>
+
+<script src="js/Three.js"></script>
+<script src="js/Detector.js"></script>
+<script src="js/Stats.js"></script>
+<script type="text/javascript">
+
+	var radius = 200, distance=400;
+	var globeWidth=window.innerWidth-10, globeHeight=window.innerHeight-10;
+	var camera, controls, scene, projector, renderer;
+	var geometry, material, meshPlanet;
+	var stats;
+	
+	var cameraRotateAngle = 0;
+	var cameraRotateSpeed = 0.005;
+	
+	 //相机所处角度，默认是在西经90度，赤道上
+	 var _cameraLon = Math.PI/2;
+	 var _cameraLat = 0;
+	 
+	 var flyStartFlag = false;
+	 var flyingSpeed = 0.01;
+	 var flyingTracks = [];
+	 var trackPtIndex = 0;
+	 
+	
+	window.onload = function() {
+	
+		if ( !Detector.webgl ) {
+	
+			Detector.addGetWebGLMessage();
+			return;
+
+		}
+	
+		init();
+		animate();
+	
+	}
+	
+	function init() {
+				
+		container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		
+		scene = new THREE.Scene();
+		projector = new THREE.Projector();
+		
+		renderer = new THREE.WebGLRenderer( { clearAlpha: 1, clearColor: 0x000000, antialias: true } );
+		renderer.setSize(globeWidth, globeHeight);
+		renderer.sortObjects = false;
+		renderer.autoClear = false;
+		renderer.gammaInput = true;
+		renderer.gammaOutput = true;
+		container.appendChild( renderer.domElement );
+		
+		camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+		camera.position.z = distance;		
+		
+		scene.add( camera );
+		
+		//TODO, TO ADD MY CAMERA CONTROL...
+		
+		// planet
+		material = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_2048_meridian_line.jpg' ), overdraw: true } ); 		
+		geometry = new THREE.SphereGeometry( radius, 100, 50 );
+		geometry.computeTangents();
+		meshPlanet = new THREE.Mesh( geometry, material );				
+		scene.add( meshPlanet );
+
+		//galaxy...
+		createGalaxy();
+		
+		stats = new Stats();
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.top = '0px';
+		stats.domElement.style.zIndex = 100;
+		container.appendChild( stats.domElement );
+		
+		window.addEventListener('resize', onWindowResize, false);
+	};
+	
+	function createGalaxy(){
+		// stars
+		var starsGeometry = new THREE.Geometry();
+
+		for ( var i = 0; i < 1500; i ++ ) {
+
+			var vertex = new THREE.Vector3();
+			vertex.x = Math.random() * 2 - 1;
+			vertex.y = Math.random() * 2 - 1;
+			vertex.z = Math.random() * 2 - 1;
+			vertex.multiplyScalar( radius );
+
+			starsGeometry.vertices.push( vertex );
+		}
+
+		var stars,
+		starsMaterials = [
+			new THREE.ParticleBasicMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
+			new THREE.ParticleBasicMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
+			new THREE.ParticleBasicMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
+			new THREE.ParticleBasicMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
+			new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
+			new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+		];
+
+		for ( i = 10; i < 30; i ++ ) {
+
+			stars = new THREE.ParticleSystem( starsGeometry, starsMaterials[ i % 6 ] );
+
+			stars.rotation.x = Math.random() * 6;
+			stars.rotation.y = Math.random() * 6;
+			stars.rotation.z = Math.random() * 6;
+
+			var s = i * 10;
+			stars.scale.set( s, s, s );
+
+			stars.matrixAutoUpdate = false;
+			stars.updateMatrix();
+
+			scene.add( stars );
+
+		}
+
+	}//end of create galaxy
+	
+	function animate() {
+
+		requestAnimationFrame( animate );
+
+		render();
+		stats.update();
+
+	};
+	
+	function render() {
+		
+		moveCamera();
+		 
+		//永远正对着目标
+		camera.lookAt(meshPlanet.position);
+		
+		renderer.clear();
+		renderer.render( scene, camera );		
+	};
+	
+	  function onWindowResize( event ) {
+		  //FIXME, 将来部署到服务器时，得按照新浪应用大小要求，写死一个大小；
+		  //2012/08/06
+		  globeWidth = window.innerWidth-10;
+		  globeHeight = window.innerHeight-10;
+
+		  renderer.setSize( globeWidth, globeHeight );
+		  camera.aspect = globeWidth / globeHeight;
+		  camera.updateProjectionMatrix();
+		
+		  camera.radius = ( globeWidth + globeHeight ) / 4;			
+	  }
+	  
+	  function flyto(lon, lat){
+		  console.log("fly to: "+lon+"/"+lat);
+		  //正在飞行时，不能重新设置
+			 if(flyStartFlag) return;
+		  
+			 //转换成弧度进行计算
+			 //FIXME, 要换成负数才行
+			 //2012/08/09
+			lon = toRadius(-lon);
+			lat = toRadius(lat);
+			
+			//清空上一次的轨迹点
+			flyingTracks = flyingTracks.splice(0, 0);
+			
+			//起始位置与目标位置经度差
+			var lonDelta = lon - _cameraLon;
+			//起始位置与目标位置纬度差
+			var latDelta = lat - _cameraLat;
+			//经向运动步长数
+			var lonSteps = Math.round(lonDelta/flyingSpeed);
+			var latSteps = Math.round(latDelta/flyingSpeed);
+			//FIXME, 这个移动步数必须是正值
+			//2012/08/06
+			var trackPtNum = Math.max(Math.abs(lonSteps), Math.abs(latSteps));
+			var lonMoveSpeed = lonDelta/trackPtNum;
+			var latMoveSpeed = latDelta/trackPtNum;
+			// 保存飞翔的轨迹点
+			for(var i=0; i<trackPtNum; i++){
+				var nextPtLon = _cameraLon + lonMoveSpeed*i;
+				var nextPtLat = _cameraLat + latMoveSpeed*i;
+				//核心算法：根据经纬度算位置
+				var endY = distance*Math.sin(nextPtLat);
+				var l= Math.sqrt(distance*distance-endY*endY);
+				var endX = l*Math.cos(nextPtLon);
+				var endZ = l*Math.sin(nextPtLon);			
+				
+				var rotateEnd = new THREE.Vector3( endX, endY, endZ );
+				flyingTracks.push(rotateEnd);
+				
+				//console.log("add pt "+i+": "+endX+"/"+endY+"/"+endZ);				
+			}
+			
+			if(flyingTracks.length>0){
+				flyStartFlag = true;				
+			}
+			
+			//保持旋转后的相机角度
+			 _cameraLon = lon;
+			 _cameraLat = lat;
+	  }
+	  
+	  function moveCamera(){		 
+		  if(!flyStartFlag) return;
+		  
+		  if(trackPtIndex>flyingTracks.length-1) return;
+		  
+		  //取出轨迹点，重新定位相机
+		  camera.position = flyingTracks[trackPtIndex];
+		  
+		  //轨迹点索引增加
+		  trackPtIndex ++;
+		  
+		  if(trackPtIndex>flyingTracks.length-1){//flying completed...
+			  trackPtIndex = 0;	
+			  flyStartFlag = false;
+		  }
+		  
+	  }//end of move camera
+	
+	  
+		function toRadius(angle){
+			return angle*Math.PI/180;
+		}
+
+
+</script>
+</head>
+<body>
+	<div id="btns">
+		<button type="button" class="button" onclick="flyto('116.4','39.9')">去北京</button><br/>
+		<button type="button" class="button" onclick="flyto('121.4','31.2')">去上海</button>
+	</div>
+</body>
+</html>

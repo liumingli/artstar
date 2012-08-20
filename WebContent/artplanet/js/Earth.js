@@ -4,8 +4,10 @@
  * core algorithm reference Google WebGL Globe 
  * http://code.google.com/p/webgl-globe/
  * --- author: lwz7512 ---
- * --- 2012/06/07 ---
+ * --- 2012/06/07 started the project---
  * 
+ * --- current version: v1.0 ---
+ * --- release: 2012/08/20 ---
 */
 
 var RBT = RBT || {};
@@ -16,13 +18,13 @@ RBT.Earth = function(container){//container:DIV
 	 
 	 var radius = 200, distance=400;
 	 var globeWidth=window.innerWidth-10, globeHeight=window.innerHeight-10;
-	 var camera, controls, scene, projector, renderer;
+	 var camera, scene, projector, renderer;
 	 var geometry, material, meshPlanet;
 	 var objects = [];		 
 	 var initialized = false;
 	 
 	 //相机所处角度，默认是在西经90度，赤道上
-	 var _cameraLon = -Math.PI;
+	 var _cameraLon = Math.PI/2;
 	 var _cameraLat = 0;
 	 
 	 var flyStartFlag = false;
@@ -64,7 +66,7 @@ RBT.Earth = function(container){//container:DIV
 			var endY = distance*Math.sin(nextPtLat);
 			var l= Math.sqrt(distance*distance-endY*endY);
 			var endX = l*Math.cos(nextPtLon);
-			var endZ = l*Math.sin(nextPtLon);
+			var endZ = l*Math.sin(nextPtLon);			
 			
 			var rotateEnd = new THREE.Vector3( endX, endY, endZ );
 			flyingTracks.push(rotateEnd);
@@ -73,8 +75,7 @@ RBT.Earth = function(container){//container:DIV
 		}
 		
 		if(flyingTracks.length>0){
-			flyStartFlag = true;
-			controls.noRotate = true;
+			flyStartFlag = true;			
 		}
 		 
 		 //保持旋转后的相机角度
@@ -86,19 +87,6 @@ RBT.Earth = function(container){//container:DIV
 	function toRadius(angle){
 		return angle*Math.PI/180;
 	}
-
-	 function sin(v){
-		 return Math.sin(v);
-	 }
-	 function cos(v){
-		 return Math.cos(v);
-	 }
-	 function asin(v){
-		return Math.asin(v);
-	 }
-	 function acos(v){
-		 return Math.acos(v);
-	 }
 	 
 	 //callback function...
 	 this.onMeshClick = function(id,name){};//callback function
@@ -169,25 +157,17 @@ RBT.Earth = function(container){//container:DIV
 			scene.add( camera );
 			
 			//camera control...
-			controls = new THREE.TrackballControls( camera, renderer.domElement );
-			controls.rotateSpeed = 1.0;
-			controls.zoomSpeed = 1.2;
-			controls.panSpeed = 0.2;		
-			controls.dynamicDampingFactor = 0.3;
-			controls.minDistance = radius * 1.1;
-			controls.maxDistance = radius * 100;	
-			controls.noZoom = true;			
-			controls.noPan = true;
-			controls.noRotate = true;
-			controls.addEventListener('change', onCamerMoved);
 			
 			// planet
-			material = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_2048_meridian _line.jpg' ), overdraw: true } ); 		
+			var earthPath = 'textures/planets/earth_atmos_2048.jpg';
+			material = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture(earthPath), overdraw: true } ); 		
 			geometry = new THREE.SphereGeometry( radius, 100, 50 );
 			geometry.computeTangents();
-			meshPlanet = new THREE.Mesh( geometry, material );					
-			scene.add( meshPlanet );
 
+			meshPlanet = new THREE.Mesh( geometry, material );		
+			
+			scene.add( meshPlanet );
+			
 			// stars
 			var starsGeometry = new THREE.Geometry();
 
@@ -213,7 +193,7 @@ RBT.Earth = function(container){//container:DIV
 				new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 			];
 
-			for ( i = 10; i < 300; i ++ ) {
+			for ( i = 10; i < 30; i ++ ) {
 
 				stars = new THREE.ParticleSystem( starsGeometry, starsMaterials[ i % 6 ] );
 
@@ -237,23 +217,6 @@ RBT.Earth = function(container){//container:DIV
 		 
 	 } //end of init()
 	 
-	 //记录当前摄影机的角度_cameraLon,_cameraLat
-	 function onCamerMoved(event){
-		 if(flyStartFlag) return;//飞行时不记录，只有在手工旋转时记录
-		 if(!initialized) return;
-		 
-		 var currentX = camera.position.x;
-		 var currentY = camera.position.y;
-		 
-		 var l= Math.sqrt(distance*distance-currentY*currentY);
-		 
-		_cameraLat = Math.asin(currentY/distance);
-		//FIXME, 很奇怪要这么搞一下才行
-		//2012/08/09
-		_cameraLon = -Math.acos(currentX/l);
-		
-	 }
-	 
 	  function moveCamera(){
 		  if(!flyStartFlag) return;
 		  
@@ -267,8 +230,7 @@ RBT.Earth = function(container){//container:DIV
 		  
 		  if(trackPtIndex>flyingTracks.length-1){//flying completed...
 			  trackPtIndex = 0;
-			  flyStartFlag = false;
-			  controls.noRotate = false;//allow to rotate...
+			  flyStartFlag = false;			  
 		  }
 		  
 	  }//end of move camera
@@ -309,10 +271,7 @@ RBT.Earth = function(container){//container:DIV
 
 		  renderer.setSize( globeWidth, globeHeight );
 		  camera.aspect = globeWidth / globeHeight;
-		  camera.updateProjectionMatrix();
-		
-		  controls.screen.width = globeWidth;
-		  controls.screen.height = globeHeight;
+		  camera.updateProjectionMatrix();				 
 		
 		  camera.radius = ( globeWidth + globeHeight ) / 4;			
 	  }
@@ -320,8 +279,7 @@ RBT.Earth = function(container){//container:DIV
 	animate = function() {
 		requestAnimationFrame( animate );
 		
-		render();//initially rotate globe...
-		controls.update();
+		render();//initially rotate globe...		
 		
 		initialized = true;
 	};
@@ -332,7 +290,8 @@ RBT.Earth = function(container){//container:DIV
 		
 		moveCamera();
 		
-		controls.update();	
+		//永远正对着目标
+		camera.lookAt(meshPlanet.position);
 		
 		renderer.clear();
 		renderer.render( scene, camera );		

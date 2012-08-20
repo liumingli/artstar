@@ -94,7 +94,7 @@ function createCube(lon, lat, city){
 	var color = 0x00FF00;
 	lon = Number(lon);
 	lat = Number(lat);
-	planet.createCube(lon, lat, 2, 0.1, color, city, city);
+	planet.createCube(lon, lat, 2, 0.05, color, city, city);
 	
 //	planet.createCube(0.1, 51.3, 0.05, color, "234", "london");	
 //	planet.createCube(-123.1, 49.2, 0.05, color, "345", "wengehua");
