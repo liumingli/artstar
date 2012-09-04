@@ -3,102 +3,86 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Welcome to Art Planet</title>
-	
 	<link rel="stylesheet" href="css/app.css">
-	
-	<script src="jquery/jquery-1.7.2.min.js"></script>
-	<script type="text/javascript" src="js/Three.js"></script>
-	<script type="text/javascript" src="js/OrbitControls.js"></script>
-	<script type="text/javascript" src="js/Detector.js"></script>
-	<script type="text/javascript" src="js/Earth.js"></script>
-	<script type="text/javascript" src="js/main.js"></script>
-	<script type="text/javascript">
+	<script src="js/lazyload-min.js"></script>
+	<script type="text/javascript">	
 	
 		var container, planet;
 		
-		function createCubes(){
-			
-		}	
-		
-		window.onload = function() {
+		function loadComplete() {
 			if ( !Detector.webgl ) {
 				Detector.addGetWebGLMessage();
 				return;
-			}
-			
-			//add interactive events for link...
-			createLeftMenus();						
-			createEventsToday();				
-
-			
+			}			
 			container = document.getElementById("container");	
 			
-			//TODO, Planet init...
+			//Planet init...
 			planet = new RBT.Earth(container);
-			planet.run();//start 3d engine...
+			
+			//...start 3d engine manually...
+			planet.run();
+			
 			planet.onMeshClick = function(id,name){
 			//	console.log("the mesh is: "+id+"/"+name);
-			}
-			
-			var color = new THREE.Color( 0xFF0000);
-			//----------- beijing -----------------to add more... 
-			planet.createCube(116.4, 39.9, 0.05, color, "123", "beijing");
-			//----------- london ---------------
-			planet.createCube(0.1, 51.3, 0.05, color, "234", "london");	
-			//----------- wengehua -----------
-			planet.createCube(-123.1, 49.2, 0.05, color, "345", "wengehua");
-			//----------- xini ------------------
-			planet.createCube(151.1, -33.5, 0.05, color, "456", "xini");
-			
-			
-			//旋转到目标点 longitude, latitude
-			
+			}				
+			//-------- 未飞行之前的默认位置(-90, 0) ----------
+			//planet.flyTo(-90, 0);
 			//-------- 北京 -----------------			
 			planet.flyTo(116, 40);
-			//-------- 伦敦 -----------------
-//			planet.flyTo(0.1, 51.3);
-			//-------- 温哥华 -----------------
-//			planet.flyTo(-123.1, 49.2);
-			//-------- 悉尼 -----------------
-//			planet.flyTo(151.1, -33.5);
 			
-			//-------- 初始位置 -----------------
-//			planet.flyTo(-90, 0);
-									
+			//查询TOP10城市
+			queryTopTenCities();						
+			
+			//移除加载文字
+			$("#loading").remove();
 			
 		} //end of app initialize...
 		
+		// Load the YUI Dom, Event, and Animation libraries if they haven't already
+		// been loaded.
+		LazyLoad.loadOnce([
+		  'jquery/jquery-1.7.2.min.js',
+		  'js/Three.js',
+		  'js/Detector.js',
+		  'js/Earth.js',
+		  'js/main.js',
+		], loadComplete);
 		
 	</script>
 </head>
 <body>
-	<!-- WebGL容器放在底部 -->
+	<!-- 加载文字 -->
+	<div id="loading" ><font size="4" color="white">loading...</font></div>
+	<!-- WebGL容器放在底部不会盖住其他内容 -->
 	<div id="container"></div>
 	<!-- 标题 -->
 	 <div id="maintitle">
 	    艺术星球 v1.0
 	 </div>
 	 <div id="subtitle">
-	   汇集全球艺术事件，尽在艺术星球！
+	   汇集全球艺术场馆，尽在艺术星球！
 	 </div>
 	 <!-- 左侧列表菜单 -->
-	 <div id="menulinks">
-	 	<a href="javascript:;" id="todayevents" >今日事件</a><br/><br/>
-	 	<a href="javascript:;" id="thisweekevents" >本周事件</a><br/><br/>
-	 	<a href="javascript:;" id="nextweekevents" >下周事件</a><br/><br/>
-	 	<a href="javascript:;" id="thismonthevents" >本月事件</a><br/><br/>
-	 	<a href="javascript:;" id="nextmonthevents" >下月事件</a><br/><br/>
+	 <div id="citylinks">
 	 </div>
 	 <!-- 右上角搜索输入框 -->
 	 <div id="searchdiv">
 		 <form onsubmit="return false;">  
 	  		<input type="text" name="searchinput" id="searchinput" class="short" 
-	  			placeholder="输入艺术事件关键字" />
-	  		<input type="button" value="查 询" class="button"/>
+	  			placeholder="输入艺术事件关键字"/>
+	  		<input id="querybtn" type="button" value="查 询" class="button" onclick="searchMuseumBy()"/>
+	  		<span  style="display: none;" id="prompt"><font color="white">loading...</font></span>
 		 </form>
 	 </div>
-	 <!-- 右侧事件信息大列表 -->
-	 <div id="eventlist">	
+    <!-- 右侧：选择的艺术场馆列表 -->
+	 <div id="museumlist">	
 	 </div>
+	 <div id="footer">
+        @ 2012 北京远博畅享科技有限公司
+        <a href="http://rainbirdtech.com" target="_blank">首页</a>|
+        <a href="http://ipintu.com" target="_blank">爱品图</a>|
+        <a href="http://ipintu.com/ipintu/miniad/index.html" target="_blank">报雨鸟微广告</a>|
+        <a href="mailto:contact@ipintu.com">联系我们</a>
+    </div>    
 </body>
 </html>

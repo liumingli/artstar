@@ -1,5 +1,7 @@
 	 html {
 	     height: 100%;
+	     overflow-x:hidden; /* 水平滚动条禁用 */
+		 /*overflow-y:hidden;*/ 
 	 }
 	    
      body {
@@ -11,59 +13,89 @@
         font-size: 13px;
         line-height: 20px;
         height: 100%;
+
+      }
+      
+      #loading {   
+      	position:fixed;
+        top: 280px;
+        left: 550px;   
+      }
+      
+      #container {
+      	position:fixed;
       }
        
       #maintitle {
-        position: absolute;
+        position:fixed;
         top: 20px;
         left: 20px;        
         width: 270px;
         padding: 10px;
         font-size: 26px;
+        z-index:1000; 
       }
       #subtitle {
-        position: absolute;
+        position:fixed;
         top: 50px;
         left: 70px;        
         width: 300px;
         padding: 10px;
         font-size: 14px;
       }
-      #menulinks {
-        position: absolute;
+      #citylinks {
+        position:fixed;
         top: 180px;
         left: 20px;        
         width: 100px;
-        padding: 10px;
+        padding: 10px;       
         font-size: 16px;
+        line-height: 200%;/* 链接间距增加 */
       }
       #searchdiv {
       	 position: absolute;
          top: 10px;
-         right: 20px;        
-         width: 250px;
+         right: 24px;        
+         width: 300px;
          padding: 10px;
          font-size: 12px;
       }
-      #eventlist {
+      #museumlist {
       	 position: absolute;
          top: 60px;
-         right: 10px;        
-         width: 270px;         
+         right: 2px;        
+         width: 330px;
+         height: 600px;        
          padding: 0px;
          font-size: 12px;
+         z-index:1000;
+         /*overflow-y:auto;*/
          /* border: 1px solid #FF0000; */          
       }
+      
+      #footer{
+      	position:fixed;      	
+      	left:0px; bottom:0;
+      	width:100%;height:50px;
+      	line-height:50px;
+      	/*border-top:1px solid #ccc;/*顶部留出的一条*/
+      	text-align:center;
+      	text-shadow:1px 1px 1px #000;
+      	color:#fff;
+      	/*background:#000;*/
+      	z-index:999;
+      	}
+      	
+      	#footer a{color:#aaa;padding:0px 10px;text-shadow:1px 1px 1px #000;}
+      	#footer a:hover{color:#fff;text-shadow:0px 0px 1px #fff;}
       
       input.short { color: #CCCCCC}
       
       /* 普通链接去掉下划线  */
       a:link {text-decoration:none; }    /* unvisited link */
       /* 移上去出现下划线 */
-      a:hover {text-decoration:none;}   /* mouse over link */      
-      a:active {color: #FFFFFF} /* mouse down */
-      /* 实时修改链接样式，实现选中逻辑 */
-      .linkselected { color:#FFFFFF; }   
+      a:hover {text-decoration:none; color:#FFFFFF; }   /* mouse over link */      
+      /*a:active {color: #FFFFFF} /* mouse down */
       
       .button {		  
 		 color: #ffffff;

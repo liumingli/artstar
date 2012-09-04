@@ -22,6 +22,10 @@
 		<property name="url" value="jdbc:mysql://localhost:3306/artplanet"/>
 		<property name="username" value="artplanet" />
 		<property name="password" value="20120723" />
+			<!-- 取得连接时进行校验 -->
+		<property name="testOnBorrow" value="true" />
+		<!-- 校验语句 -->
+		<property name="validationQuery" value="select 1" />
 	</bean>
 
 	<!-- WebEntrance servlet调用，负责处理客户端请求参数并启动任务 -->

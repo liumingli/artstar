@@ -115,17 +115,24 @@
 			    if (!regexp.test(fileName)) {
 			    	  $('#fileInfo').show().html('<img src="icons/no.png">');
 			    }else{
+			    	//禁用上传框并显示loading
+			       $('#fileUpload').attr('disabled','disabled');
+			       $('#fileInfo').show().html('<img src="icons/loading.gif">');
+			   		
 					var jqXHR = data.submit().success(
 							function(result, textStatus, jqXHR) {
 								if(result == "reject"){
 								    $('#fileInfo').show().html('<img src="icons/no.png">');
 								}else{
+									//删除显示的图片
+									$('#shotImg').remove();
+									
 									$('#shotPath').val(result);
 									$('#fileInfo').show().html('<img src="icons/ok.png">');
 									
 									//禁用文件上传
 									//$('#fileUpload').attr("style","visibility:hidden");
-									$('#fileUpload').attr('disabled','disabled');
+									$('#fileUpload').removeAttr('disabled');
 									
 									//可以框选图片的操作
 									var html = '<img id="shotImg" src="/artstar/artapi?method=getMuseumShot&relativePath='+result+'">';
@@ -140,6 +147,7 @@
 							}).error(
 							function(jqXHR, textStatus, errorThrown) {
 								console.log("error");
+								$('#fileUpload').removeAttr('disabled');
 								$('#fileInfo').show().html('<img src="imgs/no.png">');
 							}).complete(
 							function(result, textStatus, jqXHR) {
@@ -201,7 +209,8 @@
 			$('#fileUpload').removeAttr('disabled');
 //			$('#fileUpload').attr("style","visibility:visible");
 			$('#shotImg').remove();
-			
+			$('#opt').remove();
+			$('#fileInfo').hide();
 			if(result == "false"){
 				$('#subm').append('<img src="icons/no.png">');
 			}else{
@@ -279,14 +288,14 @@
 	function initSelectImage(){
 		$(document).ready(function () {
 		        ias = $('#shotImg').imgAreaSelect({
-		    	maxWidth: 200,
-		    	maxHeight: 150,
+		    	maxWidth: 280,
+		    	maxHeight: 210,
 		        handles: true,
 		        instance: true,
 		        x1: 0,
 		        y1: 0,
-		        x2: 200,
-		        y2: 150,
+		        x2: 240,
+		        y2: 180,
 		        onInit: function (img, selection) {
 		        	selectionImg = selection;
 		        	console.log('width: ' + selectionImg.width + ',height: ' + selectionImg.height + ',x1: ' + selection.x1 + ',y1: ' + selection.x2);
@@ -329,6 +338,7 @@
 				var html = '<img id="shotImg" src="/artstar/artapi?method=getMuseumShot&relativePath='+result+'">';
 				$('#shot').append(html);
 				$('#shotPath').val(result);
+				$('#fileInfo').hide();
 			}
 		});
 	}
@@ -344,6 +354,7 @@
 		$('#opt').remove();
 //		$('#fileUpload').attr("style","visibility:visible");
 		$('#fileUpload').removeAttr('disabled');
+		$('#fileInfo').hide();
 		
 		//删除刚才已上传的图片，避免垃圾
 		deleteImage();

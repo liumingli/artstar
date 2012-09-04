@@ -1,9 +1,11 @@
-/**-------- A planet Object for earth ---------
---- by rainbirdtech.com -------
- core algorithm reference Google WebGL Globe -----
-http://code.google.com/p/webgl-globe/
------ 2012/06/07 -----------
--- lwz7512 ----
+/**
+ * A planet Object for earth 
+ * --- by rainbirdtech.com ---
+ * core algorithm reference Google WebGL Globe 
+ * http://code.google.com/p/webgl-globe/
+ * --- author: lwz7512 ---
+ * --- 2012/06/07 ---
+ * 
 */
 
 var RBT = RBT || {};
@@ -17,8 +19,9 @@ RBT.Earth = function(container){//container:DIV
 	 var camera, controls, scene, projector, renderer;
 	 var geometry, material, meshPlanet;
 	 var objects = [];		 
-
-	 //�����Ƕȣ�Ĭ����������90�ȣ������
+	 var initialized = false;
+	 
+	 //相机所处角度，默认是在西经90度，赤道上
 	 var _cameraLon = -Math.PI;
 	 var _cameraLat = 0;
 	 
@@ -27,31 +30,37 @@ RBT.Earth = function(container){//container:DIV
 	 var flyingTracks = [];
 	 var trackPtIndex = 0;
 	 
-	//����㷨���ˣ�����@2012/07/27
-	 this.flyTo = function(lon, lat){//lat, γ�� lon, ����
-		 //ת���ɻ��Ƚ��м���
+	//这个算法对了！！！@2012/07/27
+	 this.flyTo = function(lon, lat){//lat, 纬度 lon, 经度
+		 //正在飞行时，不能重新设置
+		 if(flyStartFlag) return;
+		 
+		 //转换成弧度进行计算
+		 //FIXME, 要换成负数才行
+		 //2012/08/09
 		lon = toRadius(-lon);
 		lat = toRadius(lat);
 		
-		//�����һ�εĹ켣��
+		//清空上一次的轨迹点
 		flyingTracks = flyingTracks.splice(0, 0);
 		
-		//��ʼλ����Ŀ��λ�þ��Ȳ�
+		//起始位置与目标位置经度差
 		var lonDelta = lon - _cameraLon;
-		//��ʼλ����Ŀ��λ��γ�Ȳ�
+		//起始位置与目标位置纬度差
 		var latDelta = lat - _cameraLat;
-		//�����˶�������
+		//经向运动步长数
 		var lonSteps = Math.round(lonDelta/flyingSpeed);
 		var latSteps = Math.round(latDelta/flyingSpeed);
-		var trackPtNum = Math.max(lonSteps, latSteps);
+		//FIXME, 这个移动步数必须是正值
+		//2012/08/06
+		var trackPtNum = Math.max(Math.abs(lonSteps), Math.abs(latSteps));
 		var lonMoveSpeed = lonDelta/trackPtNum;
 		var latMoveSpeed = latDelta/trackPtNum;
-			
-		//TODO, �������Ĺ켣��
+		// 保存飞翔的轨迹点
 		for(var i=0; i<trackPtNum; i++){
 			var nextPtLon = _cameraLon + lonMoveSpeed*i;
 			var nextPtLat = _cameraLat + latMoveSpeed*i;
-			
+			//核心算法：根据经纬度算位置
 			var endY = distance*Math.sin(nextPtLat);
 			var l= Math.sqrt(distance*distance-endY*endY);
 			var endX = l*Math.cos(nextPtLon);
@@ -60,15 +69,15 @@ RBT.Earth = function(container){//container:DIV
 			var rotateEnd = new THREE.Vector3( endX, endY, endZ );
 			flyingTracks.push(rotateEnd);
 			
-			//console.log("add pt "+i+": "+endX+"/"+endY+"/"+endZ);			
-			
+			//console.log("add pt "+i+": "+endX+"/"+endY+"/"+endZ);				
 		}
 		
 		if(flyingTracks.length>0){
 			flyStartFlag = true;
+			controls.noRotate = true;
 		}
 		 
-		 //������ת������Ƕ�
+		 //保持旋转后的相机角度
 		 _cameraLon = lon;
 		 _cameraLat = lat;
 		 
@@ -94,26 +103,33 @@ RBT.Earth = function(container){//container:DIV
 	 //callback function...
 	 this.onMeshClick = function(id,name){};//callback function
 	 
-	 //api implementation...	 	 
-	 this.createCube = function (lon, lat, size, color, id, name){
-		   var geometry = new THREE.CubeGeometry(0.75, 0.75, 1, 1, 1, 1, null, false, { px: true,
-		          nx: true, py: true, ny: true, pz: false, nz: true});
+	 /**
+	  * 创建柱子在地球表面
+	  * 
+	  * @param lon, longitude, number;
+	  * @param lat, latitude, number;
+	  * @param size, (degree of) thickness, number;
+	  * @param height, how tall the cube, number, 0~1;
+	  * @param color, hex color, number;
+	  * @param id, id of cube, string;
+	  * @param name, name of cube, string;
+	  */	 
+	 this.createCube = function (lon, lat, size, height, color, id, name){
+		 
+		 	var materials = [];
 
-		    for (var i = 0; i < geometry.vertices.length; i++) {
-		      var vertex = geometry.vertices[i];
-		      vertex.z += 0.5;
-		    }
-		    var material = new THREE.MeshBasicMaterial({
-	            color: 0xffffff,
-	            vertexColors: THREE.FaceColors,
-	            morphTargets: false
-	          });
-		    var cube = new THREE.Mesh(geometry,material);
+			for ( var i = 0; i < 6; i ++ ) {
+				materials.push( new THREE.MeshBasicMaterial( { color: color } ) );
+			}
+		 
+		   var geometry = new THREE.CubeGeometry(1*size, 1*size, 1*size, 1, 1, 1, materials);
+		   
+		    var cube = new THREE.Mesh(geometry,new THREE.MeshFaceMaterial() );
 		    cube.id = id;
 		    cube.name = name;
 		    
-		    //����֤���˹�ʽ��ȫ��ȡ��
-		    //��������γΪ��������γΪ��
+		    //经验证，此公式完全争取：
+		    //东经、北纬为正，西经南纬为负
 		    //2012/07/23
 		    var phi = (90 - lat) * Math.PI / 180;
 		    var theta = -lon * Math.PI / 180;		    	 
@@ -124,14 +140,9 @@ RBT.Earth = function(container){//container:DIV
 		    
 		    cube.lookAt(meshPlanet.position);
 		    
-		    size = size*radius;
-		    cube.scale.z = -size;
+		    //grow tall...
+		    cube.scale.z = height*radius;
 		    cube.updateMatrix();
-
-		    var i;
-		    for (i = 0; i < cube.geometry.faces.length; i++) {
-		    	cube.geometry.faces[i].color = color;
-		    }
 
 		    scene.add(cube);
 		    objects.push(cube);
@@ -165,18 +176,18 @@ RBT.Earth = function(container){//container:DIV
 			controls.dynamicDampingFactor = 0.3;
 			controls.minDistance = radius * 1.1;
 			controls.maxDistance = radius * 100;	
-//			controls.noZoom = true;			
-			controls.noPan = true;			
+			controls.noZoom = true;			
+			controls.noPan = true;
+			controls.noRotate = true;
+			controls.addEventListener('change', onCamerMoved);
 			
 			// planet
-			material = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_2048_meridian _line.jpg' ), overdraw: true } ); 		
+			material = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_2048.jpg' ), overdraw: true } ); 		
 			geometry = new THREE.SphereGeometry( radius, 100, 50 );
 			geometry.computeTangents();
-
-			meshPlanet = new THREE.Mesh( geometry, material );		
-			
+			meshPlanet = new THREE.Mesh( geometry, material );					
 			scene.add( meshPlanet );
-			
+
 			// stars
 			var starsGeometry = new THREE.Geometry();
 
@@ -202,7 +213,7 @@ RBT.Earth = function(container){//container:DIV
 				new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 			];
 
-			for ( i = 10; i < 30; i ++ ) {
+			for ( i = 10; i < 300; i ++ ) {
 
 				stars = new THREE.ParticleSystem( starsGeometry, starsMaterials[ i % 6 ] );
 
@@ -226,22 +237,41 @@ RBT.Earth = function(container){//container:DIV
 		 
 	 } //end of init()
 	 
-	
-	  function onWindowResize( event ) {
-		  //FIXME, ��ȫ���ߴ���ֹ������ˣ�ŪС��
-		  globeWidth = window.innerWidth-10;
-		  globeHeight = window.innerHeight-10;
-
+	 //记录当前摄影机的角度_cameraLon,_cameraLat
+	 function onCamerMoved(event){
+		 if(flyStartFlag) return;//飞行时不记录，只有在手工旋转时记录
+		 if(!initialized) return;
+		 
+		 var currentX = camera.position.x;
+		 var currentY = camera.position.y;
+		 
+		 var l= Math.sqrt(distance*distance-currentY*currentY);
+		 
+		_cameraLat = Math.asin(currentY/distance);
+		//FIXME, 很奇怪要这么搞一下才行
+		//2012/08/09
+		_cameraLon = -Math.acos(currentX/l);
 		
-		  renderer.setSize( globeWidth, globeHeight );
-		  camera.aspect = globeWidth / globeHeight;
-		  camera.updateProjectionMatrix();
-		
-		  controls.screen.width = globeWidth;
-		  controls.screen.height = globeHeight;
-		
-		  camera.radius = ( globeWidth + globeHeight ) / 4;			
-	  }
+	 }
+	 
+	  function moveCamera(){
+		  if(!flyStartFlag) return;
+		  
+		  if(trackPtIndex>flyingTracks.length-1) return;
+		  
+		  //取出轨迹点，重新定位相机
+		  camera.position = flyingTracks[trackPtIndex];
+		  
+		  //轨迹点索引增加
+		  trackPtIndex ++;
+		  
+		  if(trackPtIndex>flyingTracks.length-1){//flying completed...
+			  trackPtIndex = 0;
+			  flyStartFlag = false;
+			  controls.noRotate = false;//allow to rotate...
+		  }
+		  
+	  }//end of move camera
 	  
 	  
 	  function onDocumentClick(event){
@@ -250,7 +280,7 @@ RBT.Earth = function(container){//container:DIV
 		  projector.unprojectVector( vector, camera );
 
 		  var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-		  //�������б�
+		  //检查对象列表
 		  var intersects = ray.intersectObjects( objects );
 		  
 		  if ( intersects.length > 0 ) {
@@ -270,33 +300,33 @@ RBT.Earth = function(container){//container:DIV
 		  }
 			
 	 } //end of document click
+	  
+	  function onWindowResize( event ) {
+		  //FIXME, 将来部署到服务器时，得按照新浪应用大小要求，写死一个大小；
+		  //2012/08/06
+		  globeWidth = window.innerWidth-10;
+		  globeHeight = window.innerHeight-10;
+
+		  renderer.setSize( globeWidth, globeHeight );
+		  camera.aspect = globeWidth / globeHeight;
+		  camera.updateProjectionMatrix();
 		
+		  controls.screen.width = globeWidth;
+		  controls.screen.height = globeHeight;
+		
+		  camera.radius = ( globeWidth + globeHeight ) / 4;			
+	  }
 	
 	animate = function() {
 		requestAnimationFrame( animate );
 		
 		render();//initially rotate globe...
 		controls.update();
+		
+		initialized = true;
 	};
 	
 
-	function moveCamera(){
-		if(!flyStartFlag) return;
-		
-		if(trackPtIndex>flyingTracks.length-1) return;
-		
-		//TODO, ȡ���켣�㣬���¶�λ���
-		camera.position = flyingTracks[trackPtIndex];
-		
-		//TODO, �켣����������
-		trackPtIndex ++;
-		
-		if(trackPtIndex>flyingTracks.length-1){
-			trackPtIndex = 0;
-			flyStartFlag = false;
-		}
-		
-	}//end of move camera
 	
 	function render() {				
 		
